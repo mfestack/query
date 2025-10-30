@@ -3,6 +3,9 @@ import { QueryClientProvider } from '@mfestack/react'
 import { QueryDemo } from './components/QueryDemo'
 import { MutationDemo } from './components/MutationDemo'
 import { CacheDemo } from './components/CacheDemo'
+import { SuspenseDemo } from './components/SuspenseDemo'
+import { KeepPreviousDataDemo } from './components/KeepPreviousDataDemo'
+import { FocusReconnectDemo } from './components/FocusReconnectDemo'
 import './App.css'
 
 // Create a client
@@ -31,6 +34,21 @@ function App() {
           <div className="demo-section">
             <h2>💾 Cache Demo</h2>
             <CacheDemo />
+          </div>
+
+          <div className="demo-section">
+            <h2>⏳ Suspense Demo</h2>
+            <SuspenseDemo />
+          </div>
+
+          <div className="demo-section">
+            <h2>📄 Keep Previous Data (Pagination)</h2>
+            <KeepPreviousDataDemo />
+          </div>
+
+          <div className="demo-section">
+            <h2>🔄 Refetch on Focus / Reconnect</h2>
+            <FocusReconnectDemo />
           </div>
         </main>
       </div>

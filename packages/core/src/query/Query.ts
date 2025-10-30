@@ -1,5 +1,6 @@
 // Query - Represents a single query instance
 import type { QueryKey, QueryOptions, QueryState, QueryObserver } from '../types'
+import { retryer as globalRetryer, Retryer } from '../managers/Retryer'
 import { hashKey } from '../utils/helpers'
 
 export class Query<TData = unknown, TError = Error, TVariables = unknown, TQueryKey extends QueryKey = QueryKey> {
@@ -8,6 +9,9 @@ export class Query<TData = unknown, TError = Error, TVariables = unknown, TQuery
   public options: QueryOptions<TData, TError, TVariables, TQueryKey>
   public state: QueryState<TData, TError>
   public observers: QueryObserver[] = []
+  private abortController: AbortController | null = null
+  private retryer: Retryer = globalRetryer
+  private staleTimer: any = null
 
   constructor(options: QueryOptions<TData, TError, TVariables, TQueryKey>) {
     this.queryKey = options.queryKey as TQueryKey
@@ -41,11 +45,15 @@ export class Query<TData = unknown, TError = Error, TVariables = unknown, TQuery
 
   subscribe(observer: QueryObserver) {
     this.observers.push(observer)
+    // Clear any scheduled GC in future when implementing cache-level GC
+    // If data exists and staleTime configured, ensure stale timer is active
+    this.scheduleStaleTimer()
     return () => {
       const index = this.observers.indexOf(observer)
       if (index > -1) {
         this.observers.splice(index, 1)
       }
+      // If no observers remain, allow stale timer to continue; GC handled by cache
     }
   }
 
@@ -66,13 +74,25 @@ export class Query<TData = unknown, TError = Error, TVariables = unknown, TQuery
       isError: false,
       error: null,
     }
+    this.notifyObservers()
 
     const controller = new AbortController()
+    this.abortController = controller
     try {
-      const result = await this.options.queryFn!({
+      const exec = async () => this.options.queryFn!({
         queryKey: this.queryKey,
         signal: controller.signal,
-      } as any)
+      } as any) as Promise<TData>
+
+      const result = await this.retryer.run<TData>(exec as any, {
+        retry: typeof this.options.retry === 'number' || typeof this.options.retry === 'boolean' ? (this.options.retry as any) : true,
+        retryDelay: (attempt) => {
+          const rd = this.options.retryDelay
+          if (typeof rd === 'number') return rd
+          if (typeof rd === 'function') return rd(attempt, undefined as unknown as TError)
+          return undefined as unknown as number
+        },
+      })
 
       const now = Date.now()
       this.state = {
@@ -90,7 +110,8 @@ export class Query<TData = unknown, TError = Error, TVariables = unknown, TQuery
         status: 'success',
         fetchStatus: 'idle',
       }
-
+      this.notifyObservers()
+      this.scheduleStaleTimer()
       return result as TData
     } catch (err) {
       const now = Date.now()
@@ -107,13 +128,53 @@ export class Query<TData = unknown, TError = Error, TVariables = unknown, TQuery
         status: 'error',
         fetchStatus: 'idle',
       }
-
+      this.notifyObservers()
       throw err
+    }
+  }
+
+  cancel(): void {
+    if (this.abortController) {
+      this.abortController.abort()
+      this.abortController = null
+      this.state = {
+        ...this.state,
+        isFetching: false,
+        fetchStatus: 'idle',
+      }
+      this.notifyObservers()
+    }
+    this.retryer.cancel()
+  }
+
+  private scheduleStaleTimer() {
+    if (this.staleTimer) {
+      clearTimeout(this.staleTimer)
+      this.staleTimer = null
+    }
+    const staleTime = this.options.staleTime ?? 0
+    if (staleTime > 0) {
+      this.staleTimer = setTimeout(() => {
+        this.state = { ...this.state, isStale: true }
+        this.notifyObservers()
+      }, staleTime)
+    } else {
+      // immediate stale by default if no staleTime
+      this.state = { ...this.state, isStale: true }
+      this.notifyObservers()
     }
   }
 
   invalidate(): void {
     // This will be implemented when we create the QueryManager
+  }
+
+  private notifyObservers() {
+    this.observers.forEach(observer => {
+      if (observer && typeof (observer as any).onQueryUpdate === 'function') {
+        ;(observer as any).onQueryUpdate()
+      }
+    })
   }
 
   remove(): void {

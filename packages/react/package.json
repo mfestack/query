@@ -1,6 +1,6 @@
 {
   "name": "@mfestack/react",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Hooks for managing, caching and syncing asynchronous and remote data in React",
   "author": "MFestack Team",
   "license": "MIT",
@@ -58,7 +58,7 @@
     "!src/__tests__"
   ],
   "dependencies": {
-    "@mfestack/core": "^0.1.0"
+    "@mfestack/core": "^0.2.0"
   },
   "devDependencies": {
     "@mfestack/test-utils": "workspace:*",

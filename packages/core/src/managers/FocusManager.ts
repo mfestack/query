@@ -20,13 +20,23 @@ export class FocusManager {
       this.notifyListeners()
     }
 
+    const onVisibility = () => {
+      if (typeof document !== 'undefined') {
+        const visible = document.visibilityState === 'visible'
+        this.isFocused = visible
+        this.notifyListeners()
+      }
+    }
+
     window.addEventListener('focus', onFocus)
     window.addEventListener('blur', onBlur)
+    document.addEventListener('visibilitychange', onVisibility)
 
     // Cleanup function
     return () => {
       window.removeEventListener('focus', onFocus)
       window.removeEventListener('blur', onBlur)
+      document.removeEventListener('visibilitychange', onVisibility)
     }
   }
 

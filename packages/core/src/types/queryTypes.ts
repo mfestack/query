@@ -71,6 +71,8 @@ export interface QueryOptions<TQueryFnData = unknown, TError = Error, TData = TQ
   structuralSharing?: boolean
   throwOnError?: boolean | ((error: TError) => boolean)
   select?: (data: TQueryFnData) => TData
+  keepPreviousData?: boolean
+  suspense?: boolean
 }
 
 export interface QueryObserverOptions<TQueryFnData = unknown, TError = Error, TData = TQueryFnData, TQueryKey extends QueryKey = QueryKey> 

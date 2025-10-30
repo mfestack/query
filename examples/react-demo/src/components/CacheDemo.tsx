@@ -2,7 +2,7 @@
 import { useQuery, useQueryClient } from '@mfestack/react'
 
 const fetchTime = async () => {
-  const res = await fetch('https://worldtimeapi.org/api/ip')
+  const res = await fetch('https://worldtimeapi.org/api/timezone/Etc/UTC')
   if (!res.ok) throw new Error(`Failed to fetch time (${res.status})`)
   const data = await res.json()
   return { now: data.utc_datetime ?? data.datetime }
@@ -10,7 +10,7 @@ const fetchTime = async () => {
 
 export function CacheDemo() {
   const qc = useQueryClient()
-  const query = useQuery({ queryKey: ['time'], queryFn: fetchTime })
+  const query = useQuery({ queryKey: ['time'], queryFn: fetchTime, refetchOnWindowFocus: 'always' })
 
   const setPlaceholder = () => {
     qc.setQueryData(['time'], { now: '2000-01-01T00:00:00.000Z' })
@@ -33,13 +33,18 @@ export function CacheDemo() {
       <div className="data-display">
         <pre>{JSON.stringify(query.data ?? null, null, 2)}</pre>
       </div>
+      {query.isError && (
+        <div className="status error">❌ {String(query.error)}</div>
+      )}
 
       <div>
-        <button className="button" onClick={() => query.refetch()} disabled={query.isFetching}>
+        <button className="button" onClick={() => query.refetch().catch(() => {})} disabled={query.isFetching}>
           {query.isFetching ? 'Refreshing...' : 'Refetch'}
         </button>
         <button className="button" onClick={setPlaceholder}>Set Placeholder</button>
-        <button className="button" onClick={invalidate}>Invalidate</button>
+        <button className="button" onClick={() => { invalidate() }}>
+          Invalidate
+        </button>
         <button className="button danger" onClick={clear}>Remove</button>
       </div>
     </div>

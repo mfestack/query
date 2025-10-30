@@ -50,6 +50,7 @@ export function QueryDemo() {
     queryKey: userKey,
     queryFn: userQueryFn,
     enabled: !!userId,
+    refetchOnWindowFocus: 'always',
   })
 
   // Dependent query
@@ -57,6 +58,7 @@ export function QueryDemo() {
     queryKey: postsKey,
     queryFn: postsQueryFn,
     enabled: !!userQuery.data && !userQuery.isError,
+    refetchOnWindowFocus: 'always',
   })
 
   // Error query

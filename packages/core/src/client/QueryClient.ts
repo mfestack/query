@@ -116,7 +116,17 @@ export class QueryClient implements QueryClientInterface {
   async refetchQueries(filters?: QueryFilters): Promise<void> {
     const queries = this.queryCache.findAll(filters)
     this.logger.log('refetchQueries', { filters, count: queries.length })
-    // Implementation will be added later
+    await Promise.all(
+      queries.map(async (query: any) => {
+        // Respect refetch policies on focus/reconnect/mount via filters.type 'active'
+        if (filters?.type === 'active' && query.state && query.state.isFetching) return
+        try {
+          await query.fetch()
+        } catch (_e) {
+          // swallow here; observers will handle error state
+        }
+      })
+    )
   }
 
   removeQueries(filters?: QueryFilters): void {
@@ -131,7 +141,11 @@ export class QueryClient implements QueryClientInterface {
   cancelQueries(filters?: QueryFilters): void {
     const queries = this.queryCache.findAll(filters)
     this.logger.log('cancelQueries', { filters, count: queries.length })
-    // Implementation will be added later
+    queries.forEach((query: any) => {
+      if (typeof query.cancel === 'function') {
+        query.cancel()
+      }
+    })
   }
 
   // Mutation methods
@@ -210,12 +224,32 @@ export class QueryClient implements QueryClientInterface {
     
     // Setup focus and online listeners
     focusManager.subscribe(() => {
-      this.refetchQueries({ type: 'active' })
+      const queries = this.queryCache.findAll()
+      queries.forEach((q: any) => {
+        const hasObserver = Array.isArray(q.observers) && q.observers.length > 0
+        if (!hasObserver) return
+        const opt = q.options || {}
+        const should = opt.refetchOnWindowFocus === 'always' || opt.refetchOnWindowFocus === true
+        if (should) {
+          if (q.state && q.state.isFetching) return
+          q.fetch().catch(() => {})
+        }
+      })
     })
     
     onlineManager.subscribe(() => {
       if (onlineManager.getOnlineStatus()) {
-        this.refetchQueries({ type: 'active' })
+        const queries = this.queryCache.findAll()
+        queries.forEach((q: any) => {
+          const hasObserver = Array.isArray(q.observers) && q.observers.length > 0
+          if (!hasObserver) return
+          const opt = q.options || {}
+          const should = opt.refetchOnReconnect === 'always' || opt.refetchOnReconnect === true
+          if (should) {
+            if (q.state && q.state.isFetching) return
+            q.fetch().catch(() => {})
+          }
+        })
       }
     })
   }
@@ -240,20 +274,34 @@ export class QueryClient implements QueryClientInterface {
   // Hydration methods
   hydrate(dehydratedState: DehydratedState): void {
     this.logger.log('hydrate', { state: dehydratedState })
-    // Implementation will be added later
+    if (!dehydratedState) return
+    dehydratedState.queries?.forEach((q: any) => {
+      const query = this.queryCache.build(this, {
+        queryKey: q.queryKey as QueryKey,
+        queryFn: (() => Promise.resolve(q.state?.data)) as any,
+      })
+      ;(query as any).state = { ...(query as any).state, ...(q.state || {}) }
+    })
+    dehydratedState.mutations?.forEach((_m: any) => {
+      // no-op for now
+    })
   }
 
   dehydrate(options?: DehydrateOptions): DehydratedState {
     this.logger.log('dehydrate', { options })
     
-    const state = {
-      queries: [],
+    const state: DehydratedState = {
+      queries: Array.from(this.queryCache.queriesMap.values()).map((q: any) => ({
+        queryKey: q.queryKey,
+        queryHash: q.queryHash,
+        state: q.state,
+      })),
       mutations: [],
     }
     
     // Trigger onPersist for all plugins
     this.pluginManager.getPlugins().forEach(plugin => {
-      plugin.onPersist?.(this, state)
+      try { plugin.onPersist?.(this, state) } catch {}
     })
     
     return state

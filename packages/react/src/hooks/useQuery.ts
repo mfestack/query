@@ -58,6 +58,8 @@ export function useQuery<TQueryFnData = unknown, TError = Error, TData = TQueryF
     options.structuralSharing,
     options.throwOnError,
     options.select,
+    (options as any).keepPreviousData,
+    (options as any).suspense,
   ])
 
   // Create observer
@@ -89,6 +91,17 @@ export function useQuery<TQueryFnData = unknown, TError = Error, TData = TQueryF
       observerRef.current = null
     }
   }, [client, memoizedOptions])
+
+  // Suspense support
+  if ((memoizedOptions as any).suspense) {
+    if (result.isLoading || (result.isFetching && !result.data)) {
+      const p = observerRef.current?.getCurrentResult().refetch()
+      throw p
+    }
+    if (result.isError && memoizedOptions.throwOnError) {
+      throw result.error
+    }
+  }
 
   return result
 }

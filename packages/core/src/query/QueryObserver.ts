@@ -44,6 +44,7 @@ export class QueryObserver<
   private options: QueryObserverOptions<TQueryFnData, TError, TData, TQueryKey>
   private currentQuery: any = null
   private currentResult: QueryObserverResult<TData, TError> | null = null
+  private previousResult: QueryObserverResult<TData, TError> | null = null
 
   constructor(
     client: QueryClient,
@@ -54,10 +55,16 @@ export class QueryObserver<
     this.options = options
     this.updateQuery()
     
-    // Trigger initial fetch if no data yet and queryFn provided
-    if (this.currentQuery && typeof this.options.queryFn === 'function') {
+    // Subscribe to query updates
+    if (this.currentQuery && typeof this.currentQuery.subscribe === 'function') {
+      this.currentQuery.subscribe(this as any)
+    }
+
+    // Trigger initial/refetch on mount based on options
+    if (this.currentQuery && typeof this.options.queryFn === 'function' && (this.options.enabled ?? true)) {
       const hasData = !!this.currentQuery.state.dataUpdatedAt
-      if (!hasData) {
+      const shouldRefetchOnMount = this.options.refetchOnMount === 'always' || (this.options.refetchOnMount === true && this.currentQuery.state.isStale)
+      if (!hasData || shouldRefetchOnMount) {
         // Set loading state immediately
         this.currentQuery.state = {
           ...this.currentQuery.state,
@@ -80,6 +87,7 @@ export class QueryObserver<
 
   private updateQuery() {
     const queryKey = this.options.queryKey
+    const prevQuery = this.currentQuery
     
     // Find or create query
     let query = this.client.getQueryCache().find(queryKey)
@@ -108,6 +116,24 @@ export class QueryObserver<
     }
 
     this.currentQuery = query
+    const queryChanged = prevQuery && prevQuery !== this.currentQuery
+    if (queryChanged && this.options.keepPreviousData && this.previousResult) {
+      // retain previous data while loading new key
+      this.currentResult = {
+        ...this.previousResult,
+        isLoading: true,
+        isFetching: true,
+        status: 'loading',
+        fetchStatus: 'fetching',
+        isStale: true,
+        refetch: this.refetch.bind(this),
+        remove: this.remove.bind(this),
+      }
+      this.notifyListeners()
+    }
+    if (this.currentQuery && typeof this.currentQuery.subscribe === 'function') {
+      this.currentQuery.subscribe(this as any)
+    }
     this.updateResult()
   }
 
@@ -189,6 +215,8 @@ export class QueryObserver<
   }
 
   setOptions(newOptions: QueryObserverOptions<TQueryFnData, TError, TData, TQueryKey>) {
+    // Cache previous result for keepPreviousData handling on key change
+    this.previousResult = this.currentResult
     this.options = newOptions
     this.updateQuery()
     this.notifyListeners()
@@ -215,7 +243,12 @@ export class QueryObserver<
 
   private remove() {
     if (this.currentQuery) {
-      this.client.getQueryCache().remove(this.currentQuery)
+      const gc = this.currentQuery.options?.gcTime ?? 5 * 60 * 1000
+      const toRemove = this.currentQuery
+      setTimeout(() => {
+        // Only remove if still same query and not re-used
+        this.client.getQueryCache().remove(toRemove)
+      }, Math.max(0, gc))
       this.currentQuery = null
       this.updateResult()
       this.notifyListeners()
