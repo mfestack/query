@@ -1,0 +1,45 @@
+name: Release - Publish to npm
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: 'https://registry.npmjs.org'
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: true
+      - name: Build packages
+        run: |
+          pnpm -C packages/core build
+          pnpm -C packages/react build
+      - name: Publish @mfestack/core
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          cd packages/core
+          npm publish --access public
+      - name: Update react to core version
+        run: |
+          CORE_VER=$(node -p "require('./packages/core/package.json').version")
+          node -e "const fs=require('fs');const p='./packages/react/package.json';const j=require(p);j.dependencies['@mfestack/core']='^'+process.env.CORE_VER;fs.writeFileSync(p,JSON.stringify(j,null,2))" 
+        env:
+          CORE_VER: ${{ steps.core.outputs.version }}
+      - name: Publish @mfestack/react
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          cd packages/react
+          npm publish --access public
+

@@ -1,0 +1,68 @@
+{
+  "name": "@mfestack/core",
+  "version": "0.1.0",
+  "description": "The framework agnostic core that powers MFestack Query",
+  "author": "MFestack Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mfestack/query.git",
+    "directory": "packages/core"
+  },
+  "homepage": "https://github.com/mfestack/query#readme",
+  "bugs": {
+    "url": "https://github.com/mfestack/query/issues"
+  },
+  "keywords": [
+    "query",
+    "cache",
+    "data-fetching",
+    "react",
+    "typescript",
+    "mfestack"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "clean": "premove ./build ./coverage ./dist-ts",
+    "compile": "tsc --build",
+    "test:eslint": "eslint --concurrency=auto ./src",
+    "test:lib": "vitest",
+    "test:lib:dev": "pnpm run test:lib --watch",
+    "test:build": "tsup --tsconfig tsconfig.prod.json",
+    "test:types": "tsc --build",
+    "build": "tsup --tsconfig tsconfig.prod.json"
+  },
+  "type": "module",
+  "types": "build/index.d.ts",
+  "main": "build/index.cjs",
+  "module": "build/index.js",
+  "react-native": "src/index.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./build/index.d.ts",
+        "default": "./build/index.js"
+      },
+      "require": {
+        "types": "./build/index.d.cts",
+        "default": "./build/index.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "sideEffects": false,
+  "files": [
+    "build",
+    "src",
+    "!src/__tests__"
+  ],
+  "devDependencies": {
+    "@mfestack/test-utils": "workspace:*",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@vitest/ui": "^4.0.4",
+    "jsdom": "^27.0.1",
+    "vitest": "3.2.4"
+  }
+}

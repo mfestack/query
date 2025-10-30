@@ -1,0 +1,78 @@
+{
+  "name": "@mfestack/react",
+  "version": "0.1.0",
+  "description": "Hooks for managing, caching and syncing asynchronous and remote data in React",
+  "author": "MFestack Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mfestack/query.git",
+    "directory": "packages/react"
+  },
+  "homepage": "https://github.com/mfestack/query#readme",
+  "bugs": {
+    "url": "https://github.com/mfestack/query/issues"
+  },
+  "keywords": [
+    "react",
+    "query",
+    "data-fetching",
+    "caching",
+    "mfestack"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "clean": "premove ./build ./coverage ./dist-ts",
+    "compile": "tsc --build",
+    "test:eslint": "eslint --concurrency=auto ./src",
+    "test:lib": "vitest",
+    "test:lib:dev": "pnpm run test:lib --watch",
+    "test:build": "tsup --tsconfig tsconfig.prod.json",
+    "test:types": "tsc --build",
+    "build": "tsup --tsconfig tsconfig.prod.json"
+  },
+  "type": "module",
+  "types": "build/index.d.ts",
+  "main": "build/index.cjs",
+  "module": "build/index.js",
+  "react-native": "src/index.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./build/index.d.ts",
+        "default": "./build/index.js"
+      },
+      "require": {
+        "types": "./build/index.d.cts",
+        "default": "./build/index.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "sideEffects": false,
+  "files": [
+    "build",
+    "src",
+    "!src/__tests__"
+  ],
+  "dependencies": {
+    "@mfestack/core": "^0.1.0"
+  },
+  "devDependencies": {
+    "@mfestack/test-utils": "workspace:*",
+    "@testing-library/react": "^16.1.0",
+    "@testing-library/jest-dom": "^6.4.2",
+    "@types/react": "^19.0.1",
+    "@types/react-dom": "^19.0.2",
+    "@vitejs/plugin-react": "^4.3.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "vitest": "^2.0.0",
+    "jsdom": "^25.0.0"
+  },
+  "peerDependencies": {
+    "react": "^18 || ^19"
+  }
+}

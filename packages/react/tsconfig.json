@@ -1,0 +1,21 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./build",
+    "rootDir": "./src",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "composite": true,
+    "incremental": true,
+    "jsx": "react-jsx",
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@mfestack/core": ["../core/build"],
+      "@mfestack/core/*": ["../core/build/*"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["src/__tests__", "build", "dist", "node_modules"]
+}

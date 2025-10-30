@@ -1,0 +1,38 @@
+name: CI - Build & Test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: true
+      - name: Build core
+        run: |
+          cd packages/core
+          pnpm build
+      - name: Test core
+        run: |
+          cd packages/core
+          pnpm test:lib --run
+      - name: Build react
+        run: |
+          cd packages/react
+          pnpm build
+      - name: Test react
+        run: |
+          cd packages/react
+          pnpm test:lib --run
+

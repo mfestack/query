@@ -1,0 +1,67 @@
+{
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "namedInputs": {
+    "default": ["{projectRoot}/**/*", "sharedGlobals"],
+    "production": [
+      "default",
+      "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?",
+      "!{projectRoot}/tsconfig.spec.json",
+      "!{projectRoot}/jest.config.[jt]s",
+      "!{projectRoot}/src/test-setup.[jt]s",
+      "!{projectRoot}/test-setup.[jt]s",
+      "!{projectRoot}/.eslintrc.json",
+      "!{projectRoot}/eslint.config.js"
+    ],
+    "sharedGlobals": []
+  },
+  "targetDefaults": {
+    "build": {
+      "dependsOn": ["^build"],
+      "inputs": ["production", "^production"]
+    },
+    "test": {
+      "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"]
+    },
+    "test:lib": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "vitest run"
+      }
+    },
+    "test:eslint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "eslint --concurrency=auto ./src"
+      }
+    },
+    "test:types": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --build"
+      }
+    },
+    "test:build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsup --tsconfig tsconfig.prod.json"
+      }
+    }
+  },
+  "generators": {
+    "@nx/react": {
+      "application": {
+        "style": "css",
+        "linter": "eslint",
+        "bundler": "vite"
+      },
+      "component": {
+        "style": "css"
+      },
+      "library": {
+        "style": "css",
+        "linter": "eslint"
+      }
+    }
+  },
+  "defaultProject": "mfestack-query"
+}
