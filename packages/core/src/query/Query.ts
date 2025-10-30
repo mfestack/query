@@ -85,7 +85,7 @@ export class Query<TData = unknown, TError = Error, TVariables = unknown, TQuery
       } as any) as Promise<TData>
 
       const result = await this.retryer.run<TData>(exec as any, {
-        retry: typeof this.options.retry === 'number' || typeof this.options.retry === 'boolean' ? (this.options.retry as any) : true,
+        retry: typeof this.options.retry === 'number' || typeof this.options.retry === 'boolean' ? (this.options.retry as any) : false,
         retryDelay: (attempt) => {
           const rd = this.options.retryDelay
           if (typeof rd === 'number') return rd

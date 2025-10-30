@@ -50,15 +50,11 @@ describe('useQuery - suspense and keepPreviousData', () => {
     const fnB = vi.fn(() => promiseB)
 
     function Comp({ id }: { id: string }) {
-      const { data, isLoading, refetch } = useQuery({
+      const { data, isLoading } = useQuery({
         queryKey: ['item', id],
         queryFn: id === 'a' ? fnA : fnB,
         keepPreviousData: true,
-        enabled: false,
       })
-      useEffect(() => {
-        refetch().catch(() => {})
-      }, [refetch])
       return (
         <div>
           <div data-testid="data">{(data as any) ?? ''}</div>
