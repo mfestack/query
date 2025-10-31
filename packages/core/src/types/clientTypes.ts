@@ -85,11 +85,11 @@ export interface DehydratedState {
   queries: Array<{
     queryKey: QueryKey
     queryHash: string
-    state: QueryState<any, any>
+    state: QueryState<unknown, unknown>
   }>
   mutations: Array<{
     mutationKey: MutationKey
-    state: MutationState<any, any, any, any>
+    state: MutationState<unknown, unknown, unknown, unknown>
   }>
 }
 
@@ -104,12 +104,12 @@ export interface HydrateOptions {
    * Filter function to determine which queries should be hydrated.
    * If not provided, all queries from dehydrated state will be hydrated.
    */
-  shouldHydrateQuery?: (query: { queryKey: QueryKey; queryHash: string; state?: any }) => boolean
+  shouldHydrateQuery?: (query: { queryKey: QueryKey; queryHash: string; state?: QueryState<unknown, unknown> }) => boolean
   /**
    * Filter function to determine which mutations should be hydrated.
    * If not provided, all mutations from dehydrated state will be hydrated.
    */
-  shouldHydrateMutation?: (mutation: { mutationKey: MutationKey; state?: any }) => boolean
+  shouldHydrateMutation?: (mutation: { mutationKey: MutationKey; state?: MutationState<unknown, unknown, unknown, unknown> }) => boolean
   /**
    * Specific query keys to hydrate. If provided, only queries matching these keys will be hydrated.
    * This is a convenience option that overrides shouldHydrateQuery.

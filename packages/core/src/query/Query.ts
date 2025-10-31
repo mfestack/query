@@ -12,7 +12,7 @@ export class Query<TData = unknown, TError = Error, TVariables = unknown, TQuery
   public observers: QueryObserver[] = []
   private abortController: AbortController | null = null
   private retryer: Retryer = globalRetryer
-  private staleTimer: any = null
+  private staleTimer: ReturnType<typeof setTimeout> | null = null
   private eventBus?: EventBus
 
   setEventBus(eventBus: EventBus) {

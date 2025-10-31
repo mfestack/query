@@ -36,7 +36,7 @@ export function loggerPlugin(options: LoggerPluginOptions = {}): AppStackPlugin 
     logLevel: LogLevel,
     category: string,
     message: string,
-    data?: Record<string, any>,
+    data?: Record<string, unknown>,
     error?: Error
   ): StructuredLog => {
     const structured: StructuredLog = {

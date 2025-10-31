@@ -46,11 +46,11 @@ export function hydrateScope(
   if (mergeStrategy === 'preferClient') {
     // Filter out queries/mutations that already exist with data
     const filteredState: DehydratedState = {
-      queries: dehydratedState.queries.filter((q: any) => {
+      queries: dehydratedState.queries.filter((q) => {
         const existing = client.queryCache.find(q.queryKey)
         return !existing || !existing.state.data
       }),
-      mutations: dehydratedState.mutations.filter((m: any) => {
+      mutations: dehydratedState.mutations.filter((m) => {
         const existing = client.mutationCache.find(m.mutationKey)
         return !existing || !existing.state.data
       }),
@@ -58,7 +58,7 @@ export function hydrateScope(
     client.hydrate(filteredState, options)
   } else if (mergeStrategy === 'mergeStructural') {
     // Deep merge with structural sharing
-    dehydratedState.queries?.forEach((q: any) => {
+    dehydratedState.queries?.forEach((q) => {
       const existing = client.queryCache.find(q.queryKey)
       if (existing && existing.state.data && q.state?.data) {
         // Deep merge data
@@ -120,10 +120,14 @@ export function hydrateScopes(
   })
 }
 
-export function defaultShouldDehydrateQuery(query: any): boolean {
+export function defaultShouldDehydrateQuery(
+  query: { state: { status: string; dataUpdatedAt: number } }
+): boolean {
   return query.state.status !== 'idle' || query.state.dataUpdatedAt > 0
 }
 
-export function defaultShouldDehydrateMutation(mutation: any): boolean {
+export function defaultShouldDehydrateMutation(
+  mutation: { state: { status: string } }
+): boolean {
   return mutation.state.status !== 'idle'
 }

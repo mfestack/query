@@ -7,13 +7,27 @@ on:
     branches: [ main ]
 
 jobs:
+  lint-and-typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: Install Dependencies
+        run: pnpm i --frozen-lockfile
+      - name: Lint
+        run: pnpm test:eslint
+      - name: Type Check
+        run: pnpm test:types
+
   build-and-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: pnpm/action-setup@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -22,20 +36,38 @@ jobs:
 
       - name: Install Dependencies
         run: pnpm i --frozen-lockfile
-      - name: Build core
+      
+      - name: Build all packages
+        run: pnpm build:all
+      
+      - name: Run tests with coverage
         run: |
-          cd packages/core
-          pnpm build
-      - name: Test core
-        run: |
-          cd packages/core
-          pnpm test:lib --run
-      - name: Build react
-        run: |
-          cd packages/react
-          pnpm build
-      - name: Test react
-        run: |
-          cd packages/react
-          pnpm test:lib --run
+          pnpm --filter @mfestack/core test:lib --run --coverage
+          pnpm --filter @mfestack/react test:lib --run --coverage
+      
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./packages/*/coverage/coverage-final.json
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
+
+  size-limit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: Install Dependencies
+        run: pnpm i --frozen-lockfile
+      - name: Build packages
+        run: pnpm build:all
+      - name: Size Limit
+        run: pnpm benchmark:size
+        env:
+          CI: true
 

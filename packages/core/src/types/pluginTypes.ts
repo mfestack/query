@@ -97,7 +97,7 @@ export interface StructuredLog {
   level: LogLevel
   message: string
   category: string
-  data?: Record<string, any>
+  data?: Record<string, unknown>
   error?: {
     name: string
     message: string
@@ -107,7 +107,7 @@ export interface StructuredLog {
 
 export interface ErrorSurface {
   error: Error
-  context: Record<string, any>
+  context: Record<string, unknown>
   timestamp: number
   count: number
 }

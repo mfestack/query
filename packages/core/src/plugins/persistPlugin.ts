@@ -13,7 +13,7 @@ import type { QueryCache } from '../query/QueryCache';
 
 export function persistPlugin(
   options: PersistPluginOptions = {
-    storage: typeof window !== 'undefined' ? window.localStorage : undefined as any,
+    storage: typeof window !== 'undefined' ? window.localStorage : ({} as Storage),
     key: 'mfestack-query-cache',
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
     serialize: JSON.stringify,

@@ -1,5 +1,10 @@
 # MFEStack Query
 
+[![npm version](https://img.shields.io/npm/v/@mfestack/core.svg)](https://www.npmjs.com/package/@mfestack/core)
+[![CI](https://github.com/mfestack/query/actions/workflows/test.yml/badge.svg)](https://github.com/mfestack/query/actions/workflows/test.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-%230074c1.svg)](http://www.typescriptlang.org/)
+
 A next-generation data-fetching and caching library inspired by TanStack Query, designed for enterprise, micro-frontend, and multi-framework applications.
 
 ## 🚀 Features
