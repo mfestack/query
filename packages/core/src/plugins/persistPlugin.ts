@@ -18,9 +18,10 @@ export function persistPlugin(
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
     serialize: JSON.stringify,
     deserialize: JSON.parse,
+    version: 1,
   }
 ): AppStackPlugin {
-  const { storage, key, maxAge } = options;
+  const { storage, key, maxAge, version = 1, onVersionMismatch } = options;
   
   // Use the new Persistor infrastructure internally
   const persistor = createLocalStoragePersistor({
@@ -38,7 +39,7 @@ export function persistPlugin(
       const state = dehydrate(cachedClient!)
       const data: PersistedClient = {
         timestamp: Date.now(),
-        version: 1,
+        version,
         data: state,
       }
       persistor.persistClient(data).catch((err) => {
@@ -59,6 +60,17 @@ export function persistPlugin(
         if (!restored) return
         
         const now = Date.now()
+        
+        // Check version mismatch
+        if (restored.version !== undefined && restored.version !== version) {
+          const action = onVersionMismatch?.(restored.version, version) ?? 'clear'
+          if (action === 'clear') {
+            persistor.removeClient()
+            return
+          }
+          // If action is 'migrate', continue (user can handle migration in onVersionMismatch)
+        }
+        
         if (maxAge && now - restored.timestamp < maxAge) {
           hydrate(client, restored.data as DehydratedState)
         } else {
@@ -90,7 +102,7 @@ export function persistPlugin(
       // Use the persistor for consistency
       const data: PersistedClient = {
         timestamp: Date.now(),
-        version: 1,
+        version,
         data: state,
       }
       persistor.persistClient(data).catch((err) => {

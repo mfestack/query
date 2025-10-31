@@ -9,6 +9,8 @@ import { KeepPreviousDataDemo } from './components/KeepPreviousDataDemo'
 import { FocusReconnectDemo } from './components/FocusReconnectDemo'
 import { InfiniteQueryDemo } from './components/InfiniteQueryDemo'
 import { DevToolsDemo } from './components/DevToolsDemo'
+import { DependentQueriesDemo } from './components/DependentQueriesDemo'
+import { OptimisticUpdateDemo } from './components/OptimisticUpdateDemo'
 import './App.css'
 
 // Create a client
@@ -65,6 +67,16 @@ function App() {
           <div className="demo-section">
             <h2>🔧 DevTools Demo</h2>
             <DevToolsDemo />
+          </div>
+
+          <div className="demo-section">
+            <h2>🔗 Dependent Queries</h2>
+            <DependentQueriesDemo />
+          </div>
+
+          <div className="demo-section">
+            <h2>⚡ Optimistic Updates</h2>
+            <OptimisticUpdateDemo />
           </div>
         </main>
         

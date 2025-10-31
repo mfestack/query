@@ -65,15 +65,17 @@ export function DevToolsDemo() {
   return (
     <div className="demo-card" style={{ maxWidth: '100%' }}>
       <h3>🔧 DevTools Demo</h3>
-      <p style={{ marginBottom: '1.5rem', fontSize: '0.9rem', color: '#666' }}>
-        This demo creates multiple queries and mutations. Open DevTools (bottom-right button) to see:
+      <div style={{ marginBottom: '1.5rem', fontSize: '0.9rem', color: '#666' }}>
+        <p style={{ marginBottom: '0.5rem' }}>
+          This demo creates multiple queries and mutations. Open DevTools (bottom-right button) to see:
+        </p>
         <ul style={{ marginTop: '0.5rem', paddingLeft: '1.5rem' }}>
           <li>Multiple queries in the Queries panel</li>
           <li>Mutations in the Mutations panel</li>
           <li>Events in the Events panel</li>
           <li>Cache statistics in the Cache panel</li>
         </ul>
-      </p>
+      </div>
 
       <div className="demo-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))' }}>
         <div>

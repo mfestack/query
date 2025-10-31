@@ -46,6 +46,20 @@ export {
   skipToken,
   functionalUpdate,
 } from './utils/helpers'
+
+// Adapters
+export {
+  isEdge,
+  isNode,
+  getFetch,
+  getAbortController,
+  getStorage,
+  getBroadcastChannel,
+  requestAnimationFrame,
+  cancelAnimationFrame,
+  requestIdleCallback,
+  cancelIdleCallback,
+} from './utils/adapters'
 export { EventBus, type AppStackEvents, type EventPriority, type TypedEvent, type EventListener } from './utils/EventBus'
 export { Metrics, type MetricsSnapshot } from './metrics/Metrics'
 
@@ -55,3 +69,11 @@ export { persistPlugin } from './plugins/persistPlugin'
 export { broadcastPlugin } from './plugins/broadcastPlugin'
 export { loggerPlugin } from './plugins/loggerPlugin'
 export { devtoolsPlugin } from './plugins/devtoolsPlugin'
+
+// Persistors
+export { createLocalStoragePersistor } from './plugins/persist/storage/localStoragePersistor'
+export { createMemoryPersistor } from './plugins/persist/storage/memoryPersistor'
+export { createIndexedDBPersistor } from './plugins/persist/storage/indexedDBPersistor'
+export { persistQueryClient } from './plugins/persist/persistQueryClient'
+export { createSyncCoordinator } from './plugins/sync/SyncCoordinator'
+export type { PersistedClient, Persistor } from './plugins/persist/createPersistor'

@@ -31,6 +31,9 @@ export function broadcastPlugin(options: BroadcastPluginOptions = {}): AppStackP
   let throttleTimer: ReturnType<typeof setTimeout> | null = null
   let pendingState: unknown = null
   let lastBroadcastState: string | null = null
+  
+  // Conflict resolution: track last received timestamp
+  let lastReceivedTimestamp: number = Date.now()
 
   const broadcastState = async () => {
     if (!broadcastChannel || !client) return
@@ -109,10 +112,18 @@ export function broadcastPlugin(options: BroadcastPluginOptions = {}): AppStackP
                 return
               }
               
-              // Process cache update
+              // Process cache update with conflict resolution
               if (data.type === 'cache-update' && data.state && client) {
-                // Merge state instead of full replace to avoid conflicts
-                client.hydrate(data.state as any)
+                // Timestamp-based conflict resolution: only accept newer updates
+                if (data.timestamp > lastReceivedTimestamp) {
+                  lastReceivedTimestamp = data.timestamp
+                  // Merge state instead of full replace to avoid conflicts
+                  client.hydrate(data.state as any)
+                } else if (data.timestamp < lastReceivedTimestamp) {
+                  // Received older update, ignore it to prevent conflicts
+                  // Optionally: could send our newer state back to the sender
+                }
+                // If timestamps are equal (rare), accept it (both tabs updated simultaneously)
               }
             } catch (error) {
               console.warn('Failed to process broadcast message:', error)

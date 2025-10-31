@@ -26,6 +26,7 @@ import { functionalUpdate } from '../utils/helpers'
 import { defaultOptions } from './defaultOptions'
 import { EventBus, type EventBusOptions } from '../utils/EventBus'
 import { Metrics } from '../metrics/Metrics'
+import { defaultShouldDehydrateQuery, defaultShouldDehydrateMutation } from '../hydration/hydration'
 
 export class QueryClient implements QueryClientInterface {
   public queryCache: QueryCache
@@ -310,28 +311,83 @@ export class QueryClient implements QueryClientInterface {
   hydrate(dehydratedState: DehydratedState): void {
     this.logger.log('hydrate', { state: dehydratedState })
     if (!dehydratedState) return
+    
+    // Hydrate queries
     dehydratedState.queries?.forEach((q: any) => {
-      const query = this.queryCache.build(this, {
-        queryKey: q.queryKey as QueryKey,
-        queryFn: (() => Promise.resolve(q.state?.data)) as any,
-      })
-      ;(query as any).state = { ...(query as any).state, ...(q.state || {}) }
+      const existingQuery = this.queryCache.find(q.queryKey as QueryKey)
+      
+      if (existingQuery) {
+        // Merge with existing query state
+        ;(existingQuery as any).state = {
+          ...(existingQuery as any).state,
+          ...(q.state || {}),
+          // Preserve existing data if hydrated state doesn't have data
+          data: q.state?.data !== undefined ? q.state.data : (existingQuery as any).state.data,
+        }
+      } else {
+        // Create new query from dehydrated state
+        const query = this.queryCache.build(this, {
+          queryKey: q.queryKey as QueryKey,
+          queryFn: (() => Promise.resolve(q.state?.data)) as any,
+        })
+        ;(query as any).state = { ...(query as any).state, ...(q.state || {}) }
+      }
     })
-    dehydratedState.mutations?.forEach((_m: any) => {
-      // no-op for now
+    
+    // Hydrate mutations
+    dehydratedState.mutations?.forEach((m: any) => {
+      if (m.mutationKey && m.state) {
+        const existingMutation = this.mutationCache.find(m.mutationKey)
+        
+        if (existingMutation) {
+          ;(existingMutation as any).state = {
+            ...(existingMutation as any).state,
+            ...(m.state || {}),
+          }
+        } else {
+          // Create new mutation from dehydrated state (if needed)
+          // Note: Mutations are typically ephemeral, so this may not be necessary
+          const mutation = this.mutationCache.build(this, {
+            mutationKey: m.mutationKey,
+            mutationFn: async () => m.state?.data,
+          } as any)
+          if (mutation) {
+            ;(mutation as any).state = { ...(mutation as any).state, ...(m.state || {}) }
+          }
+        }
+      }
+    })
+    
+    // Trigger onRestore for all plugins
+    this.pluginManager.getPlugins().forEach(plugin => {
+      try { plugin.onRestore?.(this, dehydratedState) } catch {}
     })
   }
 
   dehydrate(options?: DehydrateOptions): DehydratedState {
     this.logger.log('dehydrate', { options })
     
-    const state: DehydratedState = {
-      queries: Array.from(this.queryCache.queriesMap.values()).map((q: any) => ({
+    const shouldDehydrateQuery = options?.shouldDehydrateQuery ?? defaultShouldDehydrateQuery
+    const shouldDehydrateMutation = options?.shouldDehydrateMutation ?? defaultShouldDehydrateMutation
+    
+    const queries = Array.from(this.queryCache.queriesMap.values())
+      .filter((q: any) => shouldDehydrateQuery(q))
+      .map((q: any) => ({
         queryKey: q.queryKey,
         queryHash: q.queryHash,
         state: q.state,
-      })),
-      mutations: [],
+      }))
+    
+    const mutations = Array.from(this.mutationCache.mutationsMap.values())
+      .filter((m: any) => shouldDehydrateMutation(m))
+      .map((m: any) => ({
+        mutationKey: m.mutationKey,
+        state: m.state,
+      }))
+    
+    const state: DehydratedState = {
+      queries,
+      mutations,
     }
     
     // Trigger onPersist for all plugins

@@ -1,13 +1,12 @@
-import React from 'react'
 import { describe, expect, test } from 'vitest'
 import { render } from '@testing-library/react'
-import { QueryClient } from '@mfestack/core'
+import { createQueryClient } from '@mfestack/core'
 import { QueryClientProvider } from '@mfestack/react'
 import { AppStackDevtools } from '../components/AppStackDevtools'
 
 describe('AppStackDevtools', () => {
   test('should render without errors', () => {
-    const queryClient = new QueryClient()
+    const queryClient = createQueryClient()
     
     render(
       <QueryClientProvider client={queryClient}>
@@ -20,7 +19,7 @@ describe('AppStackDevtools', () => {
   })
 
   test('should render with custom client', () => {
-    const customClient = new QueryClient()
+    const customClient = createQueryClient()
     
     render(
       <QueryClientProvider client={customClient}>
@@ -33,7 +32,7 @@ describe('AppStackDevtools', () => {
   })
 
   test('should render with initialIsOpen=true', () => {
-    const queryClient = new QueryClient()
+    const queryClient = createQueryClient()
     
     render(
       <QueryClientProvider client={queryClient}>

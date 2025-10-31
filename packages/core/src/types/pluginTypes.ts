@@ -78,6 +78,8 @@ export interface PersistPluginOptions {
   maxAge?: number;
   serialize?: (data: unknown) => string;
   deserialize?: (data: string) => unknown;
+  version?: number; // Schema version for migration support
+  onVersionMismatch?: (storedVersion: number, currentVersion: number) => void | 'clear' | 'migrate';
 }
 
 export interface BroadcastPluginOptions {
