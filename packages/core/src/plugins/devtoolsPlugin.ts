@@ -42,32 +42,31 @@ export function devtoolsPlugin(options: DevToolsPluginOptions = {}): AppStackPlu
     },
 
     onQueryAdded(_query) {
-      // Send query data to DevTools
-      console.log('Query added')
+      // DevTools integration - no console logs needed
     },
 
     onQueryRemoved(_query) {
-      console.log('Query removed')
+      // DevTools integration - no console logs needed
     },
 
     onQueryUpdated(_query) {
-      console.log('Query updated')
+      // DevTools integration - no console logs needed
     },
 
     onMutationAdded(_mutation) {
-      console.log('Mutation added')
+      // DevTools integration - no console logs needed
     },
 
     onMutationRemoved(_mutation) {
-      console.log('Mutation removed')
+      // DevTools integration - no console logs needed
     },
 
     onMutationUpdated(_mutation) {
-      console.log('Mutation updated')
+      // DevTools integration - no console logs needed
     },
 
     onCacheUpdate() {
-      console.log('Cache updated')
+      // DevTools integration - no console logs needed
     },
 
     dispose() {

@@ -68,6 +68,24 @@ export class Mutation<TData = unknown, TError = Error, TVariables = unknown, TCo
     // Notify observers
     this.notifyObservers()
 
+    // Execute onMutate callback if provided (for optimistic updates)
+    let context: TContext | undefined = undefined
+    if (this.options.onMutate) {
+      try {
+        const mutateResult = await this.options.onMutate(variables)
+        context = (mutateResult !== undefined ? mutateResult : undefined) as TContext | undefined
+        // Store context in state for use in onSuccess/onError
+        this.state = {
+          ...this.state,
+          context,
+        }
+      } catch (mutateError) {
+        // If onMutate fails, continue with mutation
+        // Don't update context on error - let mutation proceed and onError will handle it
+        // Error is silently handled to avoid console pollution in production
+      }
+    }
+
     try {
       // Execute mutation function
       const result = await this.options.mutationFn(variables)
@@ -93,6 +111,11 @@ export class Mutation<TData = unknown, TError = Error, TVariables = unknown, TCo
       // Call onSuccess callback if provided
       if (this.options.onSuccess) {
         this.options.onSuccess(result as TData, variables, this.state.context)
+      }
+
+      // Call onSettled callback if provided (success case)
+      if (this.options.onSettled) {
+        this.options.onSettled(result as TData, null, variables, this.state.context)
       }
 
       return result as TData
@@ -122,6 +145,11 @@ export class Mutation<TData = unknown, TError = Error, TVariables = unknown, TCo
       // Call onError callback if provided
       if (this.options.onError) {
         this.options.onError(err, variables, this.state.context)
+      }
+
+      // Call onSettled callback if provided (error case)
+      if (this.options.onSettled) {
+        this.options.onSettled(undefined, err, variables, this.state.context)
       }
 
       throw err

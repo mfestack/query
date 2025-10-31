@@ -7,6 +7,7 @@ export * from './types'
 export { QueryClient } from './client/QueryClient'
 export { createQueryClient } from './client/createQueryClient'
 export { defaultOptions } from './client/defaultOptions'
+export { ClientRegistry, type QueryClientScope, type ScopePolicy } from './client/ClientRegistry'
 export { QueryCache } from './query/QueryCache'
 export { Query } from './query/Query'
 export { QueryObserver } from './query/QueryObserver'
@@ -28,9 +29,14 @@ export type { Task, TaskPriority, TaskId, BackoffStrategy, BackoffOptions } from
 export { 
   hydrate, 
   dehydrate, 
+  hydrateScope,
+  dehydrateScope,
+  hydrateScopes,
+  dehydrateScopes,
   defaultShouldDehydrateQuery, 
   defaultShouldDehydrateMutation 
 } from './hydration/hydration'
+export type { HydrateMergeStrategy } from './hydration/hydration'
 
 // Utils
 export {

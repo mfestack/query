@@ -5,7 +5,6 @@ function UserDetailsInner() {
   const { data } = useQuery({
     queryKey: ['user', 1],
     suspense: true,
-    refetchOnWindowFocus: 'always',
     queryFn: async () => {
       const res = await fetch('https://jsonplaceholder.typicode.com/users/1')
       if (!res.ok) throw new Error('Failed to load user')

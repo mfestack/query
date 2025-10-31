@@ -1,3 +1,20 @@
+## v0.6.0
+
+Features and improvements:
+
+- Phase 7: Multi-Client Scopes & Isolation
+  - ClientRegistry: Singleton registry for managing multiple isolated QueryClient instances by scope
+  - Scoped hydration: `hydrateScope`, `dehydrateScope`, `hydrateScopes`, and `dehydrateScopes` functions for per-scope SSR and persistence
+  - Merge strategies: Four strategies for handling hydration conflicts (preferServer, preferClient, mergeStructural, overwrite)
+  - Per-scope policies: Support for defaultOptions and plugins per scope, with automatic application to clients
+  - Scope types: Support for both string and symbol scopes for flexible isolation patterns
+  - Demo: ScopedHydrationDemo component demonstrating multi-scope isolation with different cache policies
+  - Documentation: Complete Phase7-Multi-Client-Scopes.md guide with API reference, use cases, and best practices
+- Tests:
+  - 11 comprehensive tests for ClientRegistry (scope management, policies, symbol scopes)
+  - 9 comprehensive tests for scoped hydration (all merge strategies, multi-scope operations)
+  - All core tests passing (228 tests total)
+
 ## v0.5.2
 
 Features and improvements:

@@ -10,7 +10,7 @@ const fetchTime = async () => {
 
 export function CacheDemo() {
   const qc = useQueryClient()
-  const query = useQuery({ queryKey: ['time'], queryFn: fetchTime, refetchOnWindowFocus: 'always' })
+  const query = useQuery({ queryKey: ['time'], queryFn: fetchTime })
 
   const setPlaceholder = () => {
     qc.setQueryData(['time'], { now: '2000-01-01T00:00:00.000Z' })

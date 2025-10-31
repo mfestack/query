@@ -71,7 +71,7 @@ export interface QueryClient {
   fetchQuery: <TData, TError, TVariables, TContext extends QueryKey>(
     options: QueryOptions<TData, TError, TVariables, TContext>
   ) => Promise<TData>
-  hydrate: (dehydratedState: DehydratedState) => void
+  hydrate: (dehydratedState: DehydratedState, options?: HydrateOptions) => void
   dehydrate: (options?: DehydrateOptions) => DehydratedState
   use: (plugin: AppStackPlugin) => void
   removePlugin: (pluginId: string) => void
@@ -100,6 +100,26 @@ export interface DehydrateOptions {
 
 export interface HydrateOptions {
   defaultOptions?: DefaultOptions
+  /**
+   * Filter function to determine which queries should be hydrated.
+   * If not provided, all queries from dehydrated state will be hydrated.
+   */
+  shouldHydrateQuery?: (query: { queryKey: QueryKey; queryHash: string; state?: any }) => boolean
+  /**
+   * Filter function to determine which mutations should be hydrated.
+   * If not provided, all mutations from dehydrated state will be hydrated.
+   */
+  shouldHydrateMutation?: (mutation: { mutationKey: MutationKey; state?: any }) => boolean
+  /**
+   * Specific query keys to hydrate. If provided, only queries matching these keys will be hydrated.
+   * This is a convenience option that overrides shouldHydrateQuery.
+   */
+  queryKeys?: QueryKey[]
+  /**
+   * Specific mutation keys to hydrate. If provided, only mutations matching these keys will be hydrated.
+   * This is a convenience option that overrides shouldHydrateMutation.
+   */
+  mutationKeys?: MutationKey[]
 }
 
 // Re-export types from other modules

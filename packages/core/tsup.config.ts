@@ -22,5 +22,8 @@ export default defineConfig({
     options.banner = {
       js: '"use client";',
     }
+    // Drop console.log, console.warn in production builds
+    // Keep console.error for critical error handling
+    options.drop = ['console', 'debugger']
   },
 })

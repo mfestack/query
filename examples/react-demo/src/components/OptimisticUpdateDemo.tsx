@@ -33,8 +33,11 @@ export function OptimisticUpdateDemo() {
   })
 
   // Create todo mutation with optimistic update
-  const createTodo = useMutation({
+  type CreateTodoContext = { previousTodos?: Todo[]; tempId?: number }
+  
+  const createTodo = useMutation<Todo, Error, string>({
     mutationFn: async (title: string): Promise<Todo> => {
+      console.log('mutationFn', title)
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000))
       return {
@@ -43,7 +46,8 @@ export function OptimisticUpdateDemo() {
         completed: false,
       }
     },
-    onMutate: async (title: string) => {
+    onMutate: async (title: string): Promise<CreateTodoContext> => {
+      console.log('onMutate', title)
       // Cancel outgoing refetches
       await queryClient.cancelQueries({ queryKey: ['todos'] })
 
@@ -71,16 +75,18 @@ export function OptimisticUpdateDemo() {
     },
     onError: (_err, _variables, context) => {
       // Rollback on error
-      if (context?.previousTodos) {
-        queryClient.setQueryData(['todos'], context.previousTodos)
+      const ctx = context as CreateTodoContext | undefined
+      if (ctx?.previousTodos) {
+        queryClient.setQueryData(['todos'], ctx.previousTodos)
       }
     },
     onSuccess: (newTodo, _variables, context) => {
       // Replace temporary ID with real ID from server
-      if (context?.tempId) {
+      const ctx = context as CreateTodoContext | undefined
+      if (ctx?.tempId !== undefined) {
         queryClient.setQueryData<Todo[]>(['todos'], (old = []) =>
           old.map((todo) =>
-            todo.id === context.tempId ? newTodo : todo
+            todo.id === ctx.tempId ? newTodo : todo
           )
         )
       }
@@ -88,12 +94,15 @@ export function OptimisticUpdateDemo() {
   })
 
   // Toggle todo mutation with optimistic update
-  const toggleTodo = useMutation({
+  type ToggleTodoContext = { previousTodos?: Todo[] }
+  
+  const toggleTodo = useMutation<Todo, Error, Todo>({
     mutationFn: async (todo: Todo): Promise<Todo> => {
+      console.log('mutationFn', todo)
       await new Promise((resolve) => setTimeout(resolve, 500))
       return { ...todo, completed: !todo.completed }
     },
-    onMutate: async (todo) => {
+    onMutate: async (todo): Promise<ToggleTodoContext> => {
       await queryClient.cancelQueries({ queryKey: ['todos'] })
 
       const previousTodos = queryClient.getQueryData<Todo[]>(['todos'])
@@ -106,8 +115,9 @@ export function OptimisticUpdateDemo() {
       return { previousTodos }
     },
     onError: (_err, _variables, context) => {
-      if (context?.previousTodos) {
-        queryClient.setQueryData(['todos'], context.previousTodos)
+      const ctx = context as ToggleTodoContext | undefined
+      if (ctx?.previousTodos) {
+        queryClient.setQueryData(['todos'], ctx.previousTodos)
       }
     },
   })
@@ -143,16 +153,16 @@ export function OptimisticUpdateDemo() {
           />
           <button
             type="submit"
-            disabled={createTodo.isPending}
+            disabled={createTodo.isLoading}
             className="button primary"
           >
-            {createTodo.isPending ? 'Adding...' : 'Add Todo'}
+            {createTodo.isLoading ? 'Adding...' : 'Add Todo'}
           </button>
         </form>
 
         {isLoading && <div className="status loading">Loading todos...</div>}
 
-        {createTodo.isError && (
+        {createTodo.error && (
           <div className="status error">
             Failed to create todo: {createTodo.error?.message}
           </div>
@@ -177,7 +187,7 @@ export function OptimisticUpdateDemo() {
                   type="checkbox"
                   checked={todo.completed}
                   onChange={() => toggleTodo.mutate(todo)}
-                  disabled={toggleTodo.isPending}
+                  disabled={toggleTodo.isLoading}
                 />
                 <span
                   style={{
@@ -188,7 +198,7 @@ export function OptimisticUpdateDemo() {
                 >
                   {todo.title}
                 </span>
-                {toggleTodo.isPending && (
+                {toggleTodo.isLoading && (
                   <span style={{ fontSize: '0.8em', color: '#666' }}>
                     Updating...
                   </span>

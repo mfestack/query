@@ -11,6 +11,7 @@ import { InfiniteQueryDemo } from './components/InfiniteQueryDemo'
 import { DevToolsDemo } from './components/DevToolsDemo'
 import { DependentQueriesDemo } from './components/DependentQueriesDemo'
 import { OptimisticUpdateDemo } from './components/OptimisticUpdateDemo'
+import { ScopedHydrationDemo } from './components/ScopedHydrationDemo'
 import './App.css'
 
 // Create a client
@@ -77,6 +78,11 @@ function App() {
           <div className="demo-section">
             <h2>⚡ Optimistic Updates</h2>
             <OptimisticUpdateDemo />
+          </div>
+
+          <div className="demo-section">
+            <h2>🔐 Scoped Hydration</h2>
+            <ScopedHydrationDemo />
           </div>
         </main>
         

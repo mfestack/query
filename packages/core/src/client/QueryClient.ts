@@ -108,9 +108,7 @@ export class QueryClient implements QueryClientInterface {
       })
     }
     
-    const oldData = query.state.data
     const newData = functionalUpdate(updater, query.state.data as TData | undefined)
-    this.logger.log('setQueryData', { queryKey, oldData, newData, observerCount: (query as any).observers?.length || 0 })
     const now = Date.now()
     
     // Update query state completely
@@ -135,7 +133,6 @@ export class QueryClient implements QueryClientInterface {
     if (observerCount > 0) {
       ;(query as any).notifyObservers()
     } else {
-      this.logger.log('setQueryData: No observers found for query', { queryKey, queryHash: (query as any).queryHash })
       // If no observers exist yet (query was created by setQueryData), notify query cache subscribers
       // This ensures that when observers subscribe later, they get the updated state
       this.queryCache.notify({ type: 'updated', query: query as any })
@@ -428,8 +425,6 @@ export class QueryClient implements QueryClientInterface {
   }
 
   dehydrate(options?: DehydrateOptions): DehydratedState {
-    this.logger.log('dehydrate', { options })
-    
     const shouldDehydrateQuery = options?.shouldDehydrateQuery ?? defaultShouldDehydrateQuery
     const shouldDehydrateMutation = options?.shouldDehydrateMutation ?? defaultShouldDehydrateMutation
     
