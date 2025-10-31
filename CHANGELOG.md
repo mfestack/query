@@ -1,3 +1,33 @@
+## v0.8.0
+
+Features and improvements:
+
+- Phase 9: Docs site and learning paths
+  - Documentation site: Set up VitePress documentation site with modern UI
+  - Quickstart guide: Complete getting started tutorial
+  - Installation guide: Package overview and framework-specific setup
+  - Core guides:
+    - Basic usage patterns
+    - Queries and mutations deep dive
+    - QueryClient configuration
+    - Scopes & isolation for multi-tenant apps
+  - API reference: Complete API documentation for core hooks and classes
+    - QueryClient API
+    - ClientRegistry API
+    - useQuery hook
+    - useMutation hook
+  - Recipes: Practical examples for common patterns
+    - Pagination (infinite query and manual)
+    - Optimistic updates
+    - Dependent queries
+    - SSR setup (Next.js and Remix)
+    - Scoped clients for multi-tenant apps
+  - Migration guide: Step-by-step guide from TanStack Query
+  - Developer experience:
+    - Added `docs:dev`, `docs:build`, `docs:preview` scripts
+    - Integrated docs-site into monorepo workspace
+- Documentation: Comprehensive docs covering all core features and use cases
+
 ## v0.7.0
 
 Features and improvements:

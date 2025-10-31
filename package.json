@@ -32,7 +32,10 @@
     "benchmark": "pnpm exec size-limit && pnpm --filter @mfestack/benchmarks benchmark:perf",
     "benchmark:size": "pnpm exec size-limit",
     "benchmark:perf": "pnpm --filter @mfestack/benchmarks benchmark:perf",
-    "benchmark:treeshake": "pnpm --filter @mfestack/benchmarks benchmark:treeshake"
+    "benchmark:treeshake": "pnpm --filter @mfestack/benchmarks benchmark:treeshake",
+    "docs:dev": "pnpm --filter @mfestack/docs-site dev",
+    "docs:build": "pnpm --filter @mfestack/docs-site build",
+    "docs:preview": "pnpm --filter @mfestack/docs-site preview"
   },
   "nx": {
     "includedScripts": []
@@ -58,6 +61,7 @@
     "tsup": "^8.4.0",
     "typescript": "5.8.3",
     "vite": "^6.3.6",
+    "vitepress": "^1.6.4",
     "vitest": "3.2.4"
   },
   "pnpm": {

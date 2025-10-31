@@ -13,3 +13,4 @@ packages:
   - 'examples/nextjs-demo'
   - 'examples/remix-demo'
   - 'benchmarks'
+  - 'docs-site'
