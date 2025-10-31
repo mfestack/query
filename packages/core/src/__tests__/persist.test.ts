@@ -106,23 +106,31 @@ describe('persistQueryClient', () => {
   })
 
   test('should handle persistor errors gracefully', async () => {
-    const persistor: Persistor = {
-      async persistClient() {
-        throw new Error('Storage error')
-      },
-      async restoreClient() {
-        throw new Error('Read error')
-      },
-      async removeClient() {},
+    // Suppress console warnings for this test since we're testing error handling
+    const originalWarn = console.warn
+    console.warn = vi.fn()
+
+    try {
+      const persistor: Persistor = {
+        async persistClient() {
+          throw new Error('Storage error')
+        },
+        async restoreClient() {
+          throw new Error('Read error')
+        },
+        async removeClient() {},
+      }
+
+      const client = new QueryClient()
+      client.setQueryData(['test'], 'value')
+
+      // Should not throw
+      await expect(
+        persistQueryClient({ queryClient: client, persistor })
+      ).resolves.not.toThrow()
+    } finally {
+      console.warn = originalWarn
     }
-
-    const client = new QueryClient()
-    client.setQueryData(['test'], 'value')
-
-    // Should not throw
-    await expect(
-      persistQueryClient({ queryClient: client, persistor })
-    ).resolves.not.toThrow()
   })
 
   test('should throttle cache updates', async () => {
