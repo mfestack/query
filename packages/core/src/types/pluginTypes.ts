@@ -82,6 +82,8 @@ export interface PersistPluginOptions {
 
 export interface BroadcastPluginOptions {
   channel?: string;
+  scope?: string; // Scope for multi-app isolation (e.g., 'app-a', 'workspace-123')
+  throttleMs?: number; // Throttle delay for cache updates (default: 1000ms)
   serialize?: (data: unknown) => string;
   deserialize?: (data: string) => unknown;
 }

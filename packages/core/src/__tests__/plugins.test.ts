@@ -74,6 +74,14 @@ describe('Plugins', () => {
   })
 
   describe('broadcastPlugin', () => {
+    beforeEach(() => {
+      vi.useFakeTimers()
+    })
+
+    afterEach(() => {
+      vi.useRealTimers()
+    })
+
     test('should create broadcast plugin', () => {
       const plugin = broadcastPlugin()
       
@@ -84,7 +92,7 @@ describe('Plugins', () => {
       expect(typeof plugin.dispose).toBe('function')
     })
 
-    test('should create broadcast channel', () => {
+    test('should create broadcast channel with default name', () => {
       const mockBroadcastChannel = vi.fn().mockImplementation(() => ({
         postMessage: vi.fn(),
         close: vi.fn(),
@@ -102,7 +110,25 @@ describe('Plugins', () => {
       expect(mockBroadcastChannel).toHaveBeenCalledWith('mfestack-query-sync')
     })
 
-    test('should broadcast cache updates', () => {
+    test('should create scoped broadcast channel', () => {
+      const mockBroadcastChannel = vi.fn().mockImplementation(() => ({
+        postMessage: vi.fn(),
+        close: vi.fn(),
+        onmessage: null,
+      }))
+      
+      Object.defineProperty(window, 'BroadcastChannel', {
+        value: mockBroadcastChannel,
+        writable: true,
+      })
+      
+      const plugin = broadcastPlugin({ scope: 'app-a' })
+      queryClient.use(plugin)
+      
+      expect(mockBroadcastChannel).toHaveBeenCalledWith('mfestack-query-sync-app-a')
+    })
+
+    test('should broadcast cache updates with throttling', () => {
       const mockChannel = {
         postMessage: vi.fn(),
         close: vi.fn(),
@@ -116,17 +142,218 @@ describe('Plugins', () => {
         writable: true,
       })
       
-      const plugin = broadcastPlugin()
+      const plugin = broadcastPlugin({ throttleMs: 100 })
       queryClient.use(plugin)
       
       // Trigger cache update
       const key = queryKey()
       queryClient.setQueryData(key, 'data')
       
-      expect(mockChannel.postMessage).toHaveBeenCalledWith({
-        type: 'cache-update',
-        timestamp: expect.any(Number),
+      // Should not broadcast immediately (throttled)
+      expect(mockChannel.postMessage).not.toHaveBeenCalled()
+      
+      // Advance time past throttle delay
+      vi.advanceTimersByTime(100)
+      
+      // Should have broadcasted once with full state
+      expect(mockChannel.postMessage).toHaveBeenCalledTimes(1)
+      const message = JSON.parse(mockChannel.postMessage.mock.calls[0][0])
+      expect(message.type).toBe('cache-update')
+      expect(message.state).toBeDefined()
+      expect(message.origin).toBeDefined()
+      expect(message.timestamp).toBeDefined()
+    })
+
+    test('should throttle rapid cache updates', () => {
+      const mockChannel = {
+        postMessage: vi.fn(),
+        close: vi.fn(),
+        onmessage: null,
+      }
+      
+      const mockBroadcastChannel = vi.fn().mockReturnValue(mockChannel)
+      
+      Object.defineProperty(window, 'BroadcastChannel', {
+        value: mockBroadcastChannel,
+        writable: true,
       })
+      
+      const plugin = broadcastPlugin({ throttleMs: 1000 })
+      queryClient.use(plugin)
+      
+      // Rapid cache updates
+      queryClient.setQueryData(['a'], 1)
+      queryClient.setQueryData(['b'], 2)
+      queryClient.setQueryData(['c'], 3)
+      
+      // Should not broadcast immediately
+      expect(mockChannel.postMessage).not.toHaveBeenCalled()
+      
+      // Advance time past throttle
+      vi.advanceTimersByTime(1000)
+      
+      // Should only broadcast once (last state)
+      expect(mockChannel.postMessage).toHaveBeenCalledTimes(1)
+    })
+
+    test('should ignore messages from same origin', () => {
+      const mockChannel = {
+        postMessage: vi.fn(),
+        close: vi.fn(),
+        onmessage: null as ((event: MessageEvent) => void) | null,
+      }
+      
+      const mockBroadcastChannel = vi.fn().mockReturnValue(mockChannel)
+      
+      Object.defineProperty(window, 'BroadcastChannel', {
+        value: mockBroadcastChannel,
+        writable: true,
+      })
+      
+      const plugin = broadcastPlugin()
+      queryClient.use(plugin)
+      
+      // Get the origin ID from the first broadcast
+      queryClient.setQueryData(['test'], 'value')
+      vi.advanceTimersByTime(1000)
+      
+      expect(mockChannel.postMessage).toHaveBeenCalled()
+      const firstMessage = JSON.parse(mockChannel.postMessage.mock.calls[0][0])
+      const originId = firstMessage.origin
+      
+      // Simulate receiving our own message
+      if (mockChannel.onmessage) {
+        mockChannel.onmessage({
+          data: JSON.stringify({
+            type: 'cache-update',
+            state: { queries: [], mutations: [] },
+            timestamp: Date.now(),
+            origin: originId,
+          }),
+        } as MessageEvent)
+      }
+      
+      // Should not have triggered hydrate (same origin)
+      const data = queryClient.getQueryData(['test'])
+      expect(data).toBe('value') // Still original value, not replaced
+    })
+
+    test('should filter messages by scope', () => {
+      const mockChannelA = {
+        postMessage: vi.fn(),
+        close: vi.fn(),
+        onmessage: null as ((event: MessageEvent) => void) | null,
+      }
+      
+      const mockChannelB = {
+        postMessage: vi.fn(),
+        close: vi.fn(),
+        onmessage: null as ((event: MessageEvent) => void) | null,
+      }
+      
+      let channelCount = 0
+      const mockBroadcastChannel = vi.fn().mockImplementation(() => {
+        channelCount++
+        return channelCount === 1 ? mockChannelA : mockChannelB
+      })
+      
+      Object.defineProperty(window, 'BroadcastChannel', {
+        value: mockBroadcastChannel,
+        writable: true,
+      })
+      
+      // Client A with scope 'app-a'
+      const pluginA = broadcastPlugin({ scope: 'app-a' })
+      queryClient.use(pluginA)
+      
+      // Simulate message from different scope
+      if (mockChannelA.onmessage) {
+        mockChannelA.onmessage({
+          data: JSON.stringify({
+            type: 'cache-update',
+            state: { queries: [{ queryKey: ['test'], state: { data: 'from-b' } }], mutations: [] },
+            timestamp: Date.now(),
+            origin: 'other-tab',
+            scope: 'app-b', // Different scope
+          }),
+        } as MessageEvent)
+      }
+      
+      // Should not process message from different scope
+      expect(queryClient.getQueryData(['test'])).toBeUndefined()
+    })
+
+    test('should handle dispose cleanup', () => {
+      const mockChannel = {
+        postMessage: vi.fn(),
+        close: vi.fn(),
+        onmessage: null,
+      }
+      
+      const mockBroadcastChannel = vi.fn().mockReturnValue(mockChannel)
+      
+      Object.defineProperty(window, 'BroadcastChannel', {
+        value: mockBroadcastChannel,
+        writable: true,
+      })
+      
+      const plugin = broadcastPlugin({ throttleMs: 100 })
+      queryClient.use(plugin)
+      
+      queryClient.setQueryData(['test'], 'value')
+      
+      // Dispose before throttle expires
+      plugin.dispose?.()
+      
+      // Should close channel and clear pending state
+      expect(mockChannel.close).toHaveBeenCalled()
+    })
+  })
+
+  describe('createSyncCoordinator', () => {
+    test('should start and perform initial sync (persist then broadcast)', async () => {
+      vi.useFakeTimers()
+
+      const mockChannel = {
+        postMessage: vi.fn(),
+        close: vi.fn(),
+        onmessage: null as ((event: MessageEvent) => void) | null,
+      }
+
+      const mockBroadcastChannel = vi.fn().mockReturnValue(mockChannel)
+      Object.defineProperty(window, 'BroadcastChannel', {
+        value: mockBroadcastChannel,
+        writable: true,
+      })
+
+      // Memory persistor with spies
+      let stored: any
+      const persistor = {
+        persistClient: vi.fn(async (data: any) => { stored = data }),
+        restoreClient: vi.fn(async () => stored),
+        removeClient: vi.fn(async () => { stored = undefined }),
+      }
+
+      queryClient.setQueryData(['x'], 1)
+
+      const { createSyncCoordinator } = await import('../plugins')
+      const coord = createSyncCoordinator({
+        queryClient,
+        persistor: persistor as any,
+        broadcast: { throttleMs: 100 },
+      })
+
+      await coord.start()
+
+      // Initial run schedules immediate persist+broadcast
+      // Advance timers to allow throttled broadcast
+      vi.advanceTimersByTime(100)
+
+      expect(persistor.persistClient).toHaveBeenCalled()
+      expect(mockChannel.postMessage).toHaveBeenCalled()
+
+      await coord.stop()
+      vi.useRealTimers()
     })
   })
 

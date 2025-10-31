@@ -1,3 +1,35 @@
+## v0.4.0
+
+Features and improvements:
+
+- Core - Persistence & Broadcast (Phase 4)
+  - New persistence infrastructure:
+    - `createPersistor` interface for custom storage adapters
+    - `persistQueryClient` function for automatic cache persistence
+    - `createLocalStoragePersistor` for browser localStorage
+    - `createMemoryPersistor` for SSR/testing environments
+  - Enhanced `broadcastPlugin`:
+    - Scoped channels for multi-app isolation (`scope` option)
+    - Throttling support (`throttleMs` option)
+    - Origin tracking to prevent feedback loops
+    - Full state broadcasting with deduplication
+  - New `createSyncCoordinator`:
+    - Orchestrates persistence and broadcast with proper ordering
+    - Restores from storage on startup
+    - Debounced cache updates (persist → broadcast)
+    - Handles errors gracefully
+  - Updated `persistPlugin` to use new Persistor infrastructure internally
+- Tests
+  - 9 comprehensive persistence tests
+  - 8 enhanced broadcast plugin tests
+  - 1 sync coordinator test
+  - All 89 tests passing
+
+Documentation:
+- New setup guide: "Setup - Persistence & Broadcast.md"
+- Complete examples for React and Next.js
+- Troubleshooting section
+
 ## v0.3.0
 
 Features and improvements:
