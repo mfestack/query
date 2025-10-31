@@ -1,3 +1,29 @@
+## v0.7.0
+
+Features and improvements:
+
+- Phase 8: DX, releases, and CI/CD maturity
+  - Type safety: Replaced all `any` types with proper generics (`unknown`, proper types) across core packages
+  - ESLint: Updated to error on `any` types for stricter type safety enforcement
+  - Changesets: Set up automated versioning with configuration and documentation
+  - CI/CD enhancements:
+    - Enhanced test workflow with separate lint/typecheck job
+    - Coverage collection with Codecov integration
+    - Size-limit checks in dedicated job
+    - Changesets workflow for automated version PRs
+  - Developer experience:
+    - Added README badges (npm version, CI status, license, TypeScript)
+    - Created GitHub issue templates (bug report, feature request)
+    - Created pull request template
+  - Test infrastructure:
+    - Added test setup for @mfestack/test-utils package (14 tests)
+    - Added @vitest/coverage-v8 to all test packages for coverage support
+    - Fixed circular dependency in build graph with project.json configurations
+  - Build fixes:
+    - Increased size limit for @mfestack/react package (15 KB → 16 KB)
+    - Resolved build circular dependencies between core and test-utils
+- Tests: All 228 core tests, 33 react tests, and 14 test-utils tests passing
+
 ## v0.6.0
 
 Features and improvements:
