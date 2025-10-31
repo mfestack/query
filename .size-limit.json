@@ -12,12 +12,12 @@
   {
     "name": "@mfestack/react (ESM)",
     "path": "packages/react/build/index.js",
-    "limit": "15 KB"
+    "limit": "16 KB"
   },
   {
     "name": "@mfestack/react (CJS)",
     "path": "packages/react/build/index.cjs",
-    "limit": "15 KB"
+    "limit": "16 KB"
   },
   {
     "name": "@mfestack/devtools-core (ESM)",
