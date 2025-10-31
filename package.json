@@ -21,7 +21,7 @@
     "test:build": "nx affected --target=test:build --exclude=examples/**",
     "test:types": "nx affected --target=test:types --exclude=examples/**",
     "build": "nx affected --target=build --exclude=examples/** --exclude=integrations/**",
-    "build:all": "nx run-many --target=build --exclude=examples/** --exclude=integrations/**",
+    "build:all": "nx run-many --target=build --exclude=examples/** --exclude=integrations/** --exclude=@mfestack/test-utils --nx-bail=false",
     "watch": "pnpm run build:all && nx watch --all -- pnpm run build:all",
     "dev": "pnpm run watch",
     "prettier": "prettier --experimental-cli --ignore-unknown '**/*'",

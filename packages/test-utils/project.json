@@ -1,0 +1,8 @@
+{
+  "name": "@mfestack/test-utils",
+  "targets": {
+    "build": {
+      "dependsOn": []
+    }
+  }
+}

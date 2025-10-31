@@ -1,0 +1,8 @@
+{
+  "name": "@mfestack/core",
+  "targets": {
+    "build": {
+      "dependsOn": []
+    }
+  }
+}

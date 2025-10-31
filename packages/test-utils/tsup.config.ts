@@ -7,7 +7,7 @@ export default defineConfig({
   splitting: false,
   sourcemap: true,
   clean: true,
-  external: [],
+  external: ['@mfestack/core'],
   treeshake: true,
   minify: false,
   target: 'es2022',

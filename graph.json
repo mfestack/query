@@ -1,0 +1,1126 @@
+{
+  "graph": {
+    "nodes": {
+      "@mfestack/react-devtools": {
+        "name": "@mfestack/react-devtools",
+        "type": "lib",
+        "data": {
+          "root": "packages/react-devtools",
+          "name": "@mfestack/react-devtools",
+          "tags": [
+            "npm:public",
+            "npm:react",
+            "npm:query",
+            "npm:devtools",
+            "npm:debugging",
+            "npm:mfestack"
+          ],
+          "metadata": {
+            "targetGroups": {
+              "NPM Scripts": [
+                "clean",
+                "compile",
+                "test:eslint",
+                "test:lib",
+                "test:lib:dev",
+                "test:build",
+                "test:types",
+                "build"
+              ]
+            },
+            "description": "React DevTools for AppStack Query - Interactive debugging panel",
+            "js": {
+              "packageName": "@mfestack/react-devtools",
+              "packageExports": {
+                ".": {
+                  "import": {
+                    "types": "./build/index.d.ts",
+                    "default": "./build/index.js"
+                  },
+                  "require": {
+                    "types": "./build/index.d.cts",
+                    "default": "./build/index.cjs"
+                  }
+                },
+                "./package.json": "./package.json"
+              },
+              "packageMain": "build/index.cjs",
+              "isInPackageManagerWorkspaces": true
+            }
+          },
+          "targets": {
+            "clean": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "clean"
+              },
+              "metadata": {
+                "scriptContent": "premove ./build ./coverage ./dist-ts",
+                "runCommand": "pnpm run clean"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "compile": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "compile"
+              },
+              "metadata": {
+                "scriptContent": "tsc --build",
+                "runCommand": "pnpm run compile"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "test:eslint": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "test:eslint"
+              },
+              "metadata": {
+                "scriptContent": "eslint --concurrency=auto ./src",
+                "runCommand": "pnpm run test:eslint"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "test:lib": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "test:lib"
+              },
+              "metadata": {
+                "scriptContent": "vitest",
+                "runCommand": "pnpm run test:lib"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "test:lib:dev": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "test:lib:dev"
+              },
+              "metadata": {
+                "scriptContent": "pnpm run test:lib --watch",
+                "runCommand": "pnpm run test:lib:dev"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "test:build": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "test:build"
+              },
+              "metadata": {
+                "scriptContent": "tsup --tsconfig tsconfig.prod.json",
+                "runCommand": "pnpm run test:build"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "test:types": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "test:types"
+              },
+              "metadata": {
+                "scriptContent": "tsc --build",
+                "runCommand": "pnpm run test:types"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "build": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "build"
+              },
+              "metadata": {
+                "scriptContent": "tsup --tsconfig tsconfig.prod.json",
+                "runCommand": "pnpm run build"
+              },
+              "configurations": {},
+              "parallelism": true,
+              "dependsOn": [
+                "^build"
+              ],
+              "inputs": [
+                "production",
+                "^production"
+              ]
+            }
+          },
+          "implicitDependencies": []
+        }
+      },
+      "@mfestack/devtools-core": {
+        "name": "@mfestack/devtools-core",
+        "type": "lib",
+        "data": {
+          "root": "packages/devtools-core",
+          "name": "@mfestack/devtools-core",
+          "tags": [
+            "npm:public",
+            "npm:devtools",
+            "npm:query",
+            "npm:mfestack",
+            "npm:framework-agnostic"
+          ],
+          "metadata": {
+            "targetGroups": {
+              "NPM Scripts": [
+                "clean",
+                "compile",
+                "test:eslint",
+                "test:lib",
+                "test:build",
+                "test:types",
+                "build"
+              ]
+            },
+            "description": "Framework-agnostic DevTools engine for AppStack Query (state, subscriptions, transport)",
+            "js": {
+              "packageName": "@mfestack/devtools-core",
+              "packageExports": {
+                ".": {
+                  "import": {
+                    "types": "./build/index.d.ts",
+                    "default": "./build/index.js"
+                  },
+                  "require": {
+                    "types": "./build/index.d.cts",
+                    "default": "./build/index.cjs"
+                  }
+                },
+                "./package.json": "./package.json"
+              },
+              "packageMain": "build/index.cjs",
+              "isInPackageManagerWorkspaces": true
+            }
+          },
+          "targets": {
+            "clean": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "clean"
+              },
+              "metadata": {
+                "scriptContent": "premove ./build ./coverage ./dist-ts",
+                "runCommand": "pnpm run clean"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "compile": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "compile"
+              },
+              "metadata": {
+                "scriptContent": "tsc --build",
+                "runCommand": "pnpm run compile"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "test:eslint": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "test:eslint"
+              },
+              "metadata": {
+                "scriptContent": "eslint --concurrency=auto ./src",
+                "runCommand": "pnpm run test:eslint"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "test:lib": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "test:lib"
+              },
+              "metadata": {
+                "scriptContent": "vitest",
+                "runCommand": "pnpm run test:lib"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "test:build": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "test:build"
+              },
+              "metadata": {
+                "scriptContent": "tsup --tsconfig tsconfig.prod.json",
+                "runCommand": "pnpm run test:build"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "test:types": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "test:types"
+              },
+              "metadata": {
+                "scriptContent": "tsc --build",
+                "runCommand": "pnpm run test:types"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "build": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "build"
+              },
+              "metadata": {
+                "scriptContent": "tsup --tsconfig tsconfig.prod.json",
+                "runCommand": "pnpm run build"
+              },
+              "configurations": {},
+              "parallelism": true,
+              "dependsOn": [
+                "^build"
+              ],
+              "inputs": [
+                "production",
+                "^production"
+              ]
+            }
+          },
+          "implicitDependencies": []
+        }
+      },
+      "nextjs-demo": {
+        "name": "nextjs-demo",
+        "type": "app",
+        "data": {
+          "root": "examples/nextjs-demo",
+          "name": "nextjs-demo",
+          "tags": [
+            "npm:private"
+          ],
+          "metadata": {
+            "targetGroups": {
+              "NPM Scripts": [
+                "dev",
+                "build",
+                "start",
+                "lint"
+              ]
+            },
+            "js": {
+              "packageName": "nextjs-demo",
+              "isInPackageManagerWorkspaces": true
+            }
+          },
+          "targets": {
+            "dev": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "dev"
+              },
+              "metadata": {
+                "scriptContent": "next dev",
+                "runCommand": "pnpm run dev"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "build": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "build"
+              },
+              "metadata": {
+                "scriptContent": "next build",
+                "runCommand": "pnpm run build"
+              },
+              "configurations": {},
+              "parallelism": true,
+              "dependsOn": [
+                "^build"
+              ],
+              "inputs": [
+                "production",
+                "^production"
+              ]
+            },
+            "start": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "start"
+              },
+              "metadata": {
+                "scriptContent": "next start",
+                "runCommand": "pnpm run start"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "lint": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "lint"
+              },
+              "metadata": {
+                "scriptContent": "eslint",
+                "runCommand": "pnpm run lint"
+              },
+              "configurations": {},
+              "parallelism": true
+            }
+          },
+          "implicitDependencies": []
+        }
+      },
+      "@mfestack/test-utils": {
+        "name": "@mfestack/test-utils",
+        "type": "lib",
+        "data": {
+          "root": "packages/test-utils",
+          "name": "@mfestack/test-utils",
+          "tags": [
+            "npm:public"
+          ],
+          "metadata": {
+            "targetGroups": {
+              "NPM Scripts": [
+                "clean",
+                "compile",
+                "test:eslint",
+                "test:lib",
+                "test:lib:dev",
+                "test:build",
+                "test:types",
+                "build"
+              ]
+            },
+            "description": "Testing utilities for AppStack Query",
+            "js": {
+              "packageName": "@mfestack/test-utils",
+              "packageExports": {
+                ".": {
+                  "import": {
+                    "types": "./build/modern/index.d.ts",
+                    "default": "./build/modern/index.js"
+                  },
+                  "require": {
+                    "types": "./build/modern/index.d.cts",
+                    "default": "./build/modern/index.cjs"
+                  }
+                },
+                "./package.json": "./package.json"
+              },
+              "packageMain": "build/legacy/index.cjs",
+              "isInPackageManagerWorkspaces": true
+            }
+          },
+          "targets": {
+            "clean": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "clean"
+              },
+              "metadata": {
+                "scriptContent": "premove ./build ./coverage ./dist-ts",
+                "runCommand": "pnpm run clean"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "compile": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "compile"
+              },
+              "metadata": {
+                "scriptContent": "tsc --build",
+                "runCommand": "pnpm run compile"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "test:eslint": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "test:eslint"
+              },
+              "metadata": {
+                "scriptContent": "eslint --concurrency=auto ./src",
+                "runCommand": "pnpm run test:eslint"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "test:lib": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "test:lib"
+              },
+              "metadata": {
+                "scriptContent": "vitest",
+                "runCommand": "pnpm run test:lib"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "test:lib:dev": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "test:lib:dev"
+              },
+              "metadata": {
+                "scriptContent": "pnpm run test:lib --watch",
+                "runCommand": "pnpm run test:lib:dev"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "test:build": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "test:build"
+              },
+              "metadata": {
+                "scriptContent": "tsup --tsconfig tsconfig.prod.json",
+                "runCommand": "pnpm run test:build"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "test:types": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "test:types"
+              },
+              "metadata": {
+                "scriptContent": "tsc --build",
+                "runCommand": "pnpm run test:types"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "build": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "build"
+              },
+              "metadata": {
+                "scriptContent": "tsup --tsconfig tsconfig.prod.json",
+                "runCommand": "pnpm run build"
+              },
+              "configurations": {},
+              "parallelism": true,
+              "dependsOn": [
+                "^build"
+              ],
+              "inputs": [
+                "production",
+                "^production"
+              ]
+            }
+          },
+          "implicitDependencies": []
+        }
+      },
+      "remix-demo": {
+        "name": "remix-demo",
+        "type": "app",
+        "data": {
+          "root": "examples/remix-demo",
+          "name": "remix-demo",
+          "tags": [
+            "npm:private"
+          ],
+          "metadata": {
+            "targetGroups": {
+              "NPM Scripts": [
+                "dev",
+                "build",
+                "start",
+                "typecheck"
+              ]
+            },
+            "js": {
+              "packageName": "remix-demo",
+              "isInPackageManagerWorkspaces": true
+            }
+          },
+          "targets": {
+            "dev": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "dev"
+              },
+              "metadata": {
+                "scriptContent": "vite dev",
+                "runCommand": "pnpm run dev"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "build": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "build"
+              },
+              "metadata": {
+                "scriptContent": "remix build",
+                "runCommand": "pnpm run build"
+              },
+              "configurations": {},
+              "parallelism": true,
+              "dependsOn": [
+                "^build"
+              ],
+              "inputs": [
+                "production",
+                "^production"
+              ]
+            },
+            "start": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "start"
+              },
+              "metadata": {
+                "scriptContent": "remix-serve ./build/server/index.js",
+                "runCommand": "pnpm run start"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "typecheck": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "typecheck"
+              },
+              "metadata": {
+                "scriptContent": "tsc",
+                "runCommand": "pnpm run typecheck"
+              },
+              "configurations": {},
+              "parallelism": true
+            }
+          },
+          "implicitDependencies": []
+        }
+      },
+      "@mfestack/react": {
+        "name": "@mfestack/react",
+        "type": "lib",
+        "data": {
+          "root": "packages/react",
+          "name": "@mfestack/react",
+          "tags": [
+            "npm:public",
+            "npm:react",
+            "npm:query",
+            "npm:data-fetching",
+            "npm:caching",
+            "npm:mfestack"
+          ],
+          "metadata": {
+            "targetGroups": {
+              "NPM Scripts": [
+                "clean",
+                "compile",
+                "test:eslint",
+                "test:lib",
+                "test:lib:dev",
+                "test:build",
+                "test:types",
+                "build"
+              ]
+            },
+            "description": "Hooks for managing, caching and syncing asynchronous and remote data in React",
+            "js": {
+              "packageName": "@mfestack/react",
+              "packageExports": {
+                ".": {
+                  "import": {
+                    "types": "./build/index.d.ts",
+                    "default": "./build/index.js"
+                  },
+                  "require": {
+                    "types": "./build/index.d.cts",
+                    "default": "./build/index.cjs"
+                  }
+                },
+                "./package.json": "./package.json"
+              },
+              "packageMain": "build/index.cjs",
+              "isInPackageManagerWorkspaces": true
+            }
+          },
+          "targets": {
+            "clean": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "clean"
+              },
+              "metadata": {
+                "scriptContent": "premove ./build ./coverage ./dist-ts",
+                "runCommand": "pnpm run clean"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "compile": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "compile"
+              },
+              "metadata": {
+                "scriptContent": "tsc --build",
+                "runCommand": "pnpm run compile"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "test:eslint": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "test:eslint"
+              },
+              "metadata": {
+                "scriptContent": "eslint --concurrency=auto ./src",
+                "runCommand": "pnpm run test:eslint"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "test:lib": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "test:lib"
+              },
+              "metadata": {
+                "scriptContent": "vitest",
+                "runCommand": "pnpm run test:lib"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "test:lib:dev": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "test:lib:dev"
+              },
+              "metadata": {
+                "scriptContent": "pnpm run test:lib --watch",
+                "runCommand": "pnpm run test:lib:dev"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "test:build": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "test:build"
+              },
+              "metadata": {
+                "scriptContent": "tsup --tsconfig tsconfig.prod.json",
+                "runCommand": "pnpm run test:build"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "test:types": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "test:types"
+              },
+              "metadata": {
+                "scriptContent": "tsc --build",
+                "runCommand": "pnpm run test:types"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "build": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "build"
+              },
+              "metadata": {
+                "scriptContent": "tsup --tsconfig tsconfig.prod.json",
+                "runCommand": "pnpm run build"
+              },
+              "configurations": {},
+              "parallelism": true,
+              "dependsOn": [
+                "^build"
+              ],
+              "inputs": [
+                "production",
+                "^production"
+              ]
+            }
+          },
+          "implicitDependencies": []
+        }
+      },
+      "@mfestack/core": {
+        "name": "@mfestack/core",
+        "type": "lib",
+        "data": {
+          "root": "packages/core",
+          "name": "@mfestack/core",
+          "tags": [
+            "npm:public",
+            "npm:query",
+            "npm:cache",
+            "npm:data-fetching",
+            "npm:react",
+            "npm:typescript",
+            "npm:mfestack"
+          ],
+          "metadata": {
+            "targetGroups": {
+              "NPM Scripts": [
+                "clean",
+                "compile",
+                "test:eslint",
+                "test:lib",
+                "test:lib:dev",
+                "test:build",
+                "test:types",
+                "build"
+              ]
+            },
+            "description": "The framework agnostic core that powers MFestack Query",
+            "js": {
+              "packageName": "@mfestack/core",
+              "packageExports": {
+                ".": {
+                  "import": {
+                    "types": "./build/index.d.ts",
+                    "default": "./build/index.js"
+                  },
+                  "require": {
+                    "types": "./build/index.d.cts",
+                    "default": "./build/index.cjs"
+                  }
+                },
+                "./package.json": "./package.json"
+              },
+              "packageMain": "build/index.cjs",
+              "isInPackageManagerWorkspaces": true
+            }
+          },
+          "targets": {
+            "clean": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "clean"
+              },
+              "metadata": {
+                "scriptContent": "premove ./build ./coverage ./dist-ts",
+                "runCommand": "pnpm run clean"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "compile": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "compile"
+              },
+              "metadata": {
+                "scriptContent": "tsc --build",
+                "runCommand": "pnpm run compile"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "test:eslint": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "test:eslint"
+              },
+              "metadata": {
+                "scriptContent": "eslint --concurrency=auto ./src",
+                "runCommand": "pnpm run test:eslint"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "test:lib": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "test:lib"
+              },
+              "metadata": {
+                "scriptContent": "vitest",
+                "runCommand": "pnpm run test:lib"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "test:lib:dev": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "test:lib:dev"
+              },
+              "metadata": {
+                "scriptContent": "pnpm run test:lib --watch",
+                "runCommand": "pnpm run test:lib:dev"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "test:build": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "test:build"
+              },
+              "metadata": {
+                "scriptContent": "tsup --tsconfig tsconfig.prod.json",
+                "runCommand": "pnpm run test:build"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "test:types": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "test:types"
+              },
+              "metadata": {
+                "scriptContent": "tsc --build",
+                "runCommand": "pnpm run test:types"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "build": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "build"
+              },
+              "metadata": {
+                "scriptContent": "tsup --tsconfig tsconfig.prod.json",
+                "runCommand": "pnpm run build"
+              },
+              "configurations": {},
+              "parallelism": true,
+              "dependsOn": [
+                "^build"
+              ],
+              "inputs": [
+                "production",
+                "^production"
+              ]
+            }
+          },
+          "implicitDependencies": []
+        }
+      },
+      "@mfestack/benchmarks": {
+        "name": "@mfestack/benchmarks",
+        "type": "app",
+        "data": {
+          "root": "benchmarks",
+          "name": "@mfestack/benchmarks",
+          "tags": [
+            "npm:private"
+          ],
+          "metadata": {
+            "targetGroups": {
+              "NPM Scripts": [
+                "benchmark",
+                "benchmark:size",
+                "benchmark:treeshake",
+                "benchmark:perf"
+              ]
+            },
+            "js": {
+              "packageName": "@mfestack/benchmarks",
+              "isInPackageManagerWorkspaces": true
+            }
+          },
+          "targets": {
+            "benchmark": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "benchmark"
+              },
+              "metadata": {
+                "scriptContent": "node --experimental-vm-modules --no-warnings ./src/run.ts",
+                "runCommand": "pnpm run benchmark"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "benchmark:size": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "benchmark:size"
+              },
+              "metadata": {
+                "scriptContent": "size-limit",
+                "runCommand": "pnpm run benchmark:size"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "benchmark:treeshake": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "benchmark:treeshake"
+              },
+              "metadata": {
+                "scriptContent": "node --experimental-vm-modules --no-warnings ./src/treeshake-check.ts",
+                "runCommand": "pnpm run benchmark:treeshake"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "benchmark:perf": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "benchmark:perf"
+              },
+              "metadata": {
+                "scriptContent": "node --experimental-vm-modules --no-warnings ./src/performance.ts",
+                "runCommand": "pnpm run benchmark:perf"
+              },
+              "configurations": {},
+              "parallelism": true
+            }
+          },
+          "implicitDependencies": []
+        }
+      },
+      "mfestack-query": {
+        "name": "mfestack-query",
+        "type": "app",
+        "data": {
+          "root": ".",
+          "name": "mfestack-query",
+          "includedScripts": [],
+          "tags": [
+            "npm:private"
+          ],
+          "metadata": {
+            "targetGroups": {},
+            "description": "A next-generation data-fetching and caching library inspired by TanStack Query",
+            "js": {
+              "packageName": "mfestack-query",
+              "isInPackageManagerWorkspaces": true
+            }
+          },
+          "targets": {},
+          "implicitDependencies": []
+        }
+      }
+    },
+    "dependencies": {
+      "@mfestack/react-devtools": [
+        {
+          "source": "@mfestack/react-devtools",
+          "target": "@mfestack/react",
+          "type": "static"
+        },
+        {
+          "source": "@mfestack/react-devtools",
+          "target": "@mfestack/test-utils",
+          "type": "static"
+        },
+        {
+          "source": "@mfestack/react-devtools",
+          "target": "@mfestack/core",
+          "type": "static"
+        },
+        {
+          "source": "@mfestack/react-devtools",
+          "target": "@mfestack/devtools-core",
+          "type": "static"
+        }
+      ],
+      "@mfestack/devtools-core": [
+        {
+          "source": "@mfestack/devtools-core",
+          "target": "@mfestack/core",
+          "type": "static"
+        }
+      ],
+      "nextjs-demo": [
+        {
+          "source": "nextjs-demo",
+          "target": "@mfestack/core",
+          "type": "static"
+        },
+        {
+          "source": "nextjs-demo",
+          "target": "@mfestack/react",
+          "type": "static"
+        }
+      ],
+      "@mfestack/test-utils": [
+        {
+          "source": "@mfestack/test-utils",
+          "target": "@mfestack/core",
+          "type": "static"
+        }
+      ],
+      "remix-demo": [
+        {
+          "source": "remix-demo",
+          "target": "@mfestack/core",
+          "type": "static"
+        },
+        {
+          "source": "remix-demo",
+          "target": "@mfestack/react",
+          "type": "static"
+        }
+      ],
+      "@mfestack/react": [
+        {
+          "source": "@mfestack/react",
+          "target": "@mfestack/test-utils",
+          "type": "static"
+        },
+        {
+          "source": "@mfestack/react",
+          "target": "@mfestack/core",
+          "type": "static"
+        }
+      ],
+      "@mfestack/core": [
+        {
+          "source": "@mfestack/core",
+          "target": "@mfestack/test-utils",
+          "type": "static"
+        }
+      ],
+      "@mfestack/benchmarks": [
+        {
+          "source": "@mfestack/benchmarks",
+          "target": "@mfestack/core",
+          "type": "static"
+        },
+        {
+          "source": "@mfestack/benchmarks",
+          "target": "@mfestack/react",
+          "type": "static"
+        },
+        {
+          "source": "@mfestack/benchmarks",
+          "target": "@mfestack/test-utils",
+          "type": "static"
+        }
+      ],
+      "mfestack-query": []
+    }
+  }
+}
