@@ -19,14 +19,6 @@
       "dependsOn": ["^build"],
       "inputs": ["production", "^production"]
     },
-    "@mfestack/core:build": {
-      "dependsOn": [],
-      "inputs": ["production"]
-    },
-    "@mfestack/test-utils:build": {
-      "dependsOn": [],
-      "inputs": ["production"]
-    },
     "test": {
       "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"]
     },

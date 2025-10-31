@@ -61,6 +61,7 @@
   "devDependencies": {
     "@mfestack/test-utils": "workspace:*",
     "@testing-library/jest-dom": "^6.9.1",
+    "@vitest/coverage-v8": "^3.2.4",
     "@vitest/ui": "^4.0.4",
     "jsdom": "^27.0.1",
     "vitest": "3.2.4"
