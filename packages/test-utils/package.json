@@ -46,6 +46,7 @@
     "@mfestack/core": "workspace:*"
   },
   "devDependencies": {
-    "vitest": "3.2.4"
+    "vitest": "3.2.4",
+    "@vitest/coverage-v8": "^3.2.4"
   }
 }
