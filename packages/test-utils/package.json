@@ -1,6 +1,6 @@
 {
   "name": "@mfestack/test-utils",
-  "version": "0.1.0",
+  "version": "0.8.0",
   "description": "Testing utilities for AppStack Query",
   "author": "AppStack Team",
   "license": "MIT",

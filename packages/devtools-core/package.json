@@ -1,6 +1,6 @@
 {
   "name": "@mfestack/devtools-core",
-  "version": "0.5.2",
+  "version": "0.8.0",
   "description": "Framework-agnostic DevTools engine for AppStack Query (state, subscriptions, transport)",
   "author": "MFestack Team",
   "license": "MIT",

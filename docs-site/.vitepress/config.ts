@@ -7,14 +7,14 @@ export default defineConfig({
   ignoreDeadLinks: true, // Ignore dead links during development
   themeConfig: {
     nav: [
-      { text: 'Guide', link: '/guide/' },
-      { text: 'API', link: '/api/' },
-      { text: 'Recipes', link: '/recipes/' },
-      { text: 'Migration', link: '/migration/' },
+      { text: 'Guide', link: '/guide/quickstart' },
+      { text: 'API', link: '/api/query-client' },
+      { text: 'Recipes', link: '/recipes/pagination' },
+      { text: 'Migration', link: '/migration' },
       { text: 'GitHub', link: 'https://github.com/mfestack/query' }
     ],
     sidebar: {
-      '/guide/': [
+      '/guide/quickstart': [
         {
           text: 'Getting Started',
           items: [
@@ -42,7 +42,7 @@ export default defineConfig({
           ]
         }
       ],
-      '/api/': [
+      '/api/query-client': [
         {
           text: 'Core API',
           items: [
@@ -60,7 +60,7 @@ export default defineConfig({
           ]
         }
       ],
-      '/recipes/': [
+      '/recipes/pagination': [
         { text: 'Pagination', link: '/recipes/pagination' },
         { text: 'Optimistic Updates', link: '/recipes/optimistic-updates' },
         { text: 'Dependent Queries', link: '/recipes/dependent-queries' },
