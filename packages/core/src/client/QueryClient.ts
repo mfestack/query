@@ -11,6 +11,7 @@ import type {
   MutationState,
   DehydratedState,
   DehydrateOptions,
+  HydrateOptions,
   Updater,
   Logger,
   DefaultOptions,
@@ -107,17 +108,38 @@ export class QueryClient implements QueryClientInterface {
       })
     }
     
+    const oldData = query.state.data
     const newData = functionalUpdate(updater, query.state.data as TData | undefined)
-    this.logger.log('setQueryData', { queryKey, newData })
-    query.state.data = newData
-    query.state.dataUpdatedAt = Date.now()
-    query.state.isSuccess = true
-    query.state.isError = false
-    query.state.status = 'success'
-    query.state.isFetched = true
+    this.logger.log('setQueryData', { queryKey, oldData, newData, observerCount: (query as any).observers?.length || 0 })
+    const now = Date.now()
+    
+    // Update query state completely
+    query.state = {
+      ...query.state,
+      data: newData,
+      dataUpdatedAt: now,
+      isSuccess: true,
+      isError: false,
+      isLoading: false,
+      isPending: false,
+      isInitialLoading: false,
+      isFetched: true,
+      status: 'success',
+      fetchStatus: 'idle',
+      isFetching: false,
+    }
     
     // Notify observers so useQuery hooks re-render
-    ;(query as any).notifyObservers()
+    // Force a synchronous notification to ensure observers are updated
+    const observerCount = (query as any).observers?.length || 0
+    if (observerCount > 0) {
+      ;(query as any).notifyObservers()
+    } else {
+      this.logger.log('setQueryData: No observers found for query', { queryKey, queryHash: (query as any).queryHash })
+      // If no observers exist yet (query was created by setQueryData), notify query cache subscribers
+      // This ensures that when observers subscribe later, they get the updated state
+      this.queryCache.notify({ type: 'updated', query: query as any })
+    }
     
     // Emit EventBus event
     this.eventBus.emit('query:updated', { query: query as any }, 'normal')
@@ -301,7 +323,6 @@ export class QueryClient implements QueryClientInterface {
     if (!this.isMounted) return
     
     this.isMounted = false
-    this.logger.log('unmount')
   }
 
   isFetching(filters?: QueryFilters): number {
@@ -315,12 +336,43 @@ export class QueryClient implements QueryClientInterface {
   }
 
   // Hydration methods
-  hydrate(dehydratedState: DehydratedState): void {
-    this.logger.log('hydrate', { state: dehydratedState })
+  hydrate(dehydratedState: DehydratedState, options?: HydrateOptions): void {
     if (!dehydratedState) return
     
-    // Hydrate queries
+    // Helper to check if query should be hydrated
+    const shouldHydrateQuery = (q: any): boolean => {
+      // If queryKeys filter is provided, check if this query matches
+      if (options?.queryKeys && options.queryKeys.length > 0) {
+        return options.queryKeys.some(key => JSON.stringify(key) === JSON.stringify(q.queryKey))
+      }
+      // Otherwise use shouldHydrateQuery filter if provided
+      if (options?.shouldHydrateQuery) {
+        return options.shouldHydrateQuery(q)
+      }
+      // Default: hydrate all queries
+      return true
+    }
+    
+    // Helper to check if mutation should be hydrated
+    const shouldHydrateMutation = (m: any): boolean => {
+      // If mutationKeys filter is provided, check if this mutation matches
+      if (options?.mutationKeys && options.mutationKeys.length > 0) {
+        return options.mutationKeys.some(key => JSON.stringify(key) === JSON.stringify(m.mutationKey))
+      }
+      // Otherwise use shouldHydrateMutation filter if provided
+      if (options?.shouldHydrateMutation) {
+        return options.shouldHydrateMutation(m)
+      }
+      // Default: hydrate all mutations
+      return true
+    }
+    
+    // Hydrate queries (with filtering)
     dehydratedState.queries?.forEach((q: any) => {
+      if (!shouldHydrateQuery(q)) {
+        return // Skip this query
+      }
+      
       const existingQuery = this.queryCache.find(q.queryKey as QueryKey)
       
       if (existingQuery) {
@@ -341,8 +393,12 @@ export class QueryClient implements QueryClientInterface {
       }
     })
     
-    // Hydrate mutations
+    // Hydrate mutations (with filtering)
     dehydratedState.mutations?.forEach((m: any) => {
+      if (!shouldHydrateMutation(m)) {
+        return // Skip this mutation
+      }
+      
       if (m.mutationKey && m.state) {
         const existingMutation = this.mutationCache.find(m.mutationKey)
         

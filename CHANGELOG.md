@@ -1,3 +1,16 @@
+## v0.5.2
+
+Features and improvements:
+
+- Phase 3 Completion: Infinite queries, SSR, and examples
+  - Remix SSR example: Complete server-side rendering demo with route loaders, prefetch, dehydration, and client hydration
+  - Node/Edge adapters: Complete cross-runtime compatibility utilities (isServer, isEdge, isNode, getFetch, getAbortController, etc.)
+  - Examples verification: Confirmed all Phase 3 examples exist (pagination, dependent queries, optimistic updates)
+  - Documentation: Created Phase3-Verification.md with complete checklist and file references
+- Bug fixes:
+  - Removed debug console.log statements from QueryClient (mount, unmount, hydrate, dehydrate)
+  - Fixed Remix demo setup: Added to workspace, fixed dependencies, resolved TypeScript React 18/19 compatibility issues
+
 ## v0.5.1
 
 Bug fixes and improvements:
