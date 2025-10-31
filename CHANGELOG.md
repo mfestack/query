@@ -1,3 +1,13 @@
+## v0.5.1
+
+Bug fixes and improvements:
+
+- Fixed devtoolsBridge integration tests: Replaced invalid `test.skip()` calls with `test.skipIf()` at test definition level
+- Added test suite for `@mfestack/react-devtools` package: 3 smoke tests to verify component rendering
+- Added vitest configuration for react-devtools package with jsdom environment
+- Fixed TypeScript lint errors in test files (implicit any types, unused imports)
+- All test suites now passing: 259 tests total (208 core, 33 react, 15 devtools-core, 3 react-devtools)
+
 ## v0.5.0
 
 Features and improvements:

@@ -1,6 +1,6 @@
 {
   "name": "@mfestack/react",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Hooks for managing, caching and syncing asynchronous and remote data in React",
   "author": "MFestack Team",
   "license": "MIT",
