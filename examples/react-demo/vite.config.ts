@@ -8,8 +8,10 @@ export default defineConfig({
   // Temporary local alias for development before npm publish
   resolve: {
     alias: {
-      '@mfestack/core': path.resolve(__dirname, '../../packages/core/build'),
-      '@mfestack/react': path.resolve(__dirname, '../../packages/react/build'),
+      '@mfestack/core': path.resolve(__dirname, '../../packages/core/src'),
+      '@mfestack/react': path.resolve(__dirname, '../../packages/react/src'),
+      '@mfestack/react-devtools': path.resolve(__dirname, '../../packages/react-devtools/src'),
+      '@mfestack/devtools-core': path.resolve(__dirname, '../../packages/devtools-core/src'),
     },
   },
 })

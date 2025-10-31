@@ -28,18 +28,24 @@
     "prettier:write": "pnpm run prettier --write",
     "changeset": "changeset",
     "changeset:version": "changeset version && pnpm install --no-frozen-lockfile && pnpm prettier:write",
-    "changeset:publish": "changeset publish"
+    "changeset:publish": "changeset publish",
+    "benchmark": "pnpm exec size-limit && pnpm --filter @mfestack/benchmarks benchmark:perf",
+    "benchmark:size": "pnpm exec size-limit",
+    "benchmark:perf": "pnpm --filter @mfestack/benchmarks benchmark:perf",
+    "benchmark:treeshake": "pnpm --filter @mfestack/benchmarks benchmark:treeshake"
   },
   "nx": {
     "includedScripts": []
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.5",
+    "@size-limit/preset-small-lib": "^11.2.0",
     "@tanstack/config": "^0.20.2",
     "@types/node": "^22.15.3",
     "@types/react": "^19.0.1",
     "@types/react-dom": "^19.0.2",
     "@vitest/coverage-istanbul": "3.2.4",
+    "esbuild": "^0.25.11",
     "esbuild-plugin-file-path-extensions": "^2.1.4",
     "eslint": "^9.36.0",
     "jsdom": "^27.0.0",
@@ -48,6 +54,7 @@
     "prettier": "^3.6.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "size-limit": "^11.2.0",
     "tsup": "^8.4.0",
     "typescript": "5.8.3",
     "vite": "^6.3.6",
@@ -62,6 +69,8 @@
       "@mfestack/svelte": "workspace:*",
       "@mfestack/solid": "workspace:*",
       "@mfestack/devtools": "workspace:*",
+      "@mfestack/react-devtools": "workspace:*",
+      "@mfestack/devtools-core": "workspace:*",
       "@mfestack/persist-client": "workspace:*",
       "@mfestack/broadcast-client": "workspace:*",
       "@mfestack/test-utils": "workspace:*"

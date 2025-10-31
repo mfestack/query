@@ -1,0 +1,66 @@
+{
+  "name": "@mfestack/devtools-core",
+  "version": "0.4.0",
+  "description": "Framework-agnostic DevTools engine for AppStack Query (state, subscriptions, transport)",
+  "author": "MFestack Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mfestack/query.git",
+    "directory": "packages/devtools-core"
+  },
+  "homepage": "https://github.com/mfestack/query#readme",
+  "bugs": {
+    "url": "https://github.com/mfestack/query/issues"
+  },
+  "keywords": [
+    "devtools",
+    "query",
+    "mfestack",
+    "framework-agnostic"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "clean": "premove ./build ./coverage ./dist-ts",
+    "compile": "tsc --build",
+    "test:eslint": "eslint --concurrency=auto ./src",
+    "test:lib": "vitest",
+    "test:build": "tsup --tsconfig tsconfig.prod.json",
+    "test:types": "tsc --build",
+    "build": "tsup --tsconfig tsconfig.prod.json"
+  },
+  "type": "module",
+  "types": "build/index.d.ts",
+  "main": "build/index.cjs",
+  "module": "build/index.js",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./build/index.d.ts",
+        "default": "./build/index.js"
+      },
+      "require": {
+        "types": "./build/index.d.cts",
+        "default": "./build/index.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "sideEffects": false,
+  "files": [
+    "build",
+    "src",
+    "!src/__tests__"
+  ],
+  "dependencies": {
+    "@mfestack/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.3",
+    "typescript": "5.8.3",
+    "tsup": "^8.4.0",
+    "vitest": "3.2.4"
+  }
+}

@@ -1,73 +1,99 @@
-# React + TypeScript + Vite
+# React Demo - AppStack Query with DevTools
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is a comprehensive demo showcasing AppStack Query features including the DevTools integration.
 
-Currently, two official plugins are available:
+## Features Demonstrated
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- ✅ **Basic Queries** - Fetching and caching data
+- ✅ **Mutations** - Creating, updating, and deleting data
+- ✅ **Cache Management** - Manual cache manipulation
+- ✅ **Suspense Support** - React Suspense integration
+- ✅ **Keep Previous Data** - Pagination with smooth transitions
+- ✅ **Refetch Behaviors** - Focus and reconnect refetching
+- ✅ **Infinite Queries** - Infinite scroll/pagination
+- ✅ **DevTools** - Interactive debugging panel
 
-## React Compiler
+## Getting Started
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Install Dependencies
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+pnpm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Run Development Server
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+pnpm dev
 ```
+
+Open [http://localhost:5173](http://localhost:5173) to view the demo.
+
+## DevTools Usage
+
+The demo includes the **AppStack DevTools** panel. To use it:
+
+1. **Open DevTools**: Click the button in the bottom-right corner (or set `initialIsOpen={true}`)
+2. **Navigate Tabs**:
+   - **Queries**: View all active queries, their status, and perform actions (refetch, invalidate, remove)
+   - **Mutations**: Monitor mutation state and errors
+   - **Cache**: View cache statistics and clear the cache
+   - **Events**: See real-time EventBus events
+
+3. **Try it out**:
+   - Trigger queries and mutations in the demo
+   - Watch them appear in real-time in DevTools
+   - Use action buttons to refetch, invalidate, or remove queries
+   - View events as they fire
+
+## DevTools Features
+
+### Queries Panel
+- Real-time query list with status indicators
+- Query keys and hash information
+- Stale/fetching indicators
+- Action buttons: 🔄 Refetch, ⚠️ Invalidate, 🗑️ Remove
+
+### Mutations Panel
+- Active mutations with status
+- Error display for failed mutations
+- Pending state tracking
+
+### Cache Panel
+- Statistics (total queries, active queries, errors)
+- Clear cache button
+
+### Events Panel
+- Real-time EventBus event timeline
+- Event type color coding
+- Expandable payload details
+
+## Code Example
+
+```tsx
+import { QueryClient, QueryClientProvider } from '@mfestack/react'
+import { AppStackDevtools } from '@mfestack/react-devtools'
+
+const queryClient = new QueryClient()
+
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      {/* Your app */}
+      <AppStackDevtools 
+        initialIsOpen={false}
+        position="bottom"
+        buttonPosition="bottom-right"
+      />
+    </QueryClientProvider>
+  )
+}
+```
+
+## Build for Production
+
+```bash
+pnpm build
+```
+
+DevTools will automatically be excluded in production builds (`process.env.NODE_ENV !== 'development'`).

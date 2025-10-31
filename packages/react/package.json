@@ -58,7 +58,7 @@
     "!src/__tests__"
   ],
   "dependencies": {
-    "@mfestack/core": "^0.2.0"
+    "@mfestack/core": "workspace:*"
   },
   "devDependencies": {
     "@mfestack/test-utils": "workspace:*",

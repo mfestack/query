@@ -20,6 +20,10 @@ export { notifyManager } from './managers/NotifyManager'
 export { batchManager } from './managers/BatchManager'
 export { retryer } from './managers/Retryer'
 
+// Scheduler
+export { TaskScheduler, taskScheduler, BackoffController, defaultBackoffController } from './scheduler'
+export type { Task, TaskPriority, TaskId, BackoffStrategy, BackoffOptions } from './scheduler'
+
 // Hydration
 export { 
   hydrate, 
@@ -42,6 +46,8 @@ export {
   skipToken,
   functionalUpdate,
 } from './utils/helpers'
+export { EventBus, type AppStackEvents, type EventPriority, type TypedEvent, type EventListener } from './utils/EventBus'
+export { Metrics, type MetricsSnapshot } from './metrics/Metrics'
 
 // Plugin system
 export { PluginManager } from './plugins/PluginManager'

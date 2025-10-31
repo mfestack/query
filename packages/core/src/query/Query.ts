@@ -1,5 +1,6 @@
 // Query - Represents a single query instance
 import type { QueryKey, QueryOptions, QueryState, QueryObserver } from '../types'
+import type { EventBus } from '../utils/EventBus'
 import { retryer as globalRetryer, Retryer } from '../managers/Retryer'
 import { hashKey } from '../utils/helpers'
 
@@ -12,6 +13,11 @@ export class Query<TData = unknown, TError = Error, TVariables = unknown, TQuery
   private abortController: AbortController | null = null
   private retryer: Retryer = globalRetryer
   private staleTimer: any = null
+  private eventBus?: EventBus
+
+  setEventBus(eventBus: EventBus) {
+    this.eventBus = eventBus
+  }
 
   constructor(options: QueryOptions<TData, TError, TVariables, TQueryKey>) {
     this.queryKey = options.queryKey as TQueryKey
@@ -75,6 +81,11 @@ export class Query<TData = unknown, TError = Error, TVariables = unknown, TQuery
       error: null,
     }
     this.notifyObservers()
+    
+    // Emit EventBus event for fetch start
+    if (this.eventBus) {
+      this.eventBus.emit('query:updated', { query: this as any, state: this.state }, 'normal')
+    }
 
     const controller = new AbortController()
     this.abortController = controller
@@ -111,6 +122,12 @@ export class Query<TData = unknown, TError = Error, TVariables = unknown, TQuery
         fetchStatus: 'idle',
       }
       this.notifyObservers()
+      
+      // Emit EventBus event for successful fetch
+      if (this.eventBus) {
+        this.eventBus.emit('query:updated', { query: this as any, state: this.state }, 'normal')
+      }
+      
       this.scheduleStaleTimer()
       return result as TData
     } catch (err) {
@@ -129,6 +146,12 @@ export class Query<TData = unknown, TError = Error, TVariables = unknown, TQuery
         fetchStatus: 'idle',
       }
       this.notifyObservers()
+      
+      // Emit EventBus event for failed fetch
+      if (this.eventBus) {
+        this.eventBus.emit('query:updated', { query: this as any, state: this.state }, 'normal')
+      }
+      
       throw err
     }
   }

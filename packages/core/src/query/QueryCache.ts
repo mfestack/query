@@ -1,14 +1,21 @@
 // QueryCache - Manages query storage and retrieval
 import type { QueryKey, QueryOptions, QueryFilters, QueryCacheNotifyEvent, QueryClient, QueryFunction } from '../types'
+import type { EventBus } from '../utils/EventBus'
 import { Query } from './Query'
 import { hashKey, matchQuery } from '../utils/helpers'
 import { Subscribable } from '../utils/Subscribable'
 
 export class QueryCache extends Subscribable<(event: QueryCacheNotifyEvent) => void> {
   private queries = new Map<string, Query>()
+  private eventBus?: EventBus
 
-  constructor() {
+  constructor(eventBus?: EventBus) {
     super()
+    this.eventBus = eventBus
+  }
+
+  setEventBus(eventBus: EventBus) {
+    this.eventBus = eventBus
   }
 
   find<TData = unknown, TError = Error>(queryKey: QueryKey): Query<TData, TError> | undefined {
@@ -31,6 +38,10 @@ export class QueryCache extends Subscribable<(event: QueryCacheNotifyEvent) => v
     if (!this.queries.has(queryHash)) {
       this.queries.set(queryHash, query as unknown as Query<unknown, Error, unknown, QueryKey>)
       this.notify({ type: 'added', query })
+      // Emit EventBus event
+      if (this.eventBus) {
+        this.eventBus.emit('query:added', { query: query as any }, 'normal')
+      }
     }
   }
 
@@ -38,6 +49,10 @@ export class QueryCache extends Subscribable<(event: QueryCacheNotifyEvent) => v
     const queryHash = query.queryHash
     if (this.queries.delete(queryHash)) {
       this.notify({ type: 'removed', query })
+      // Emit EventBus event
+      if (this.eventBus) {
+        this.eventBus.emit('query:removed', { query: query as any }, 'normal')
+      }
     }
   }
 
@@ -67,6 +82,10 @@ export class QueryCache extends Subscribable<(event: QueryCacheNotifyEvent) => v
         queryFn: options.queryFn as QueryFunction<TData, QueryKey>
       }
       query = new Query<TData, TError, TVariables, QueryKey>(queryOptions) as Query<TData, TError>
+      // Set EventBus reference on query for lifecycle events
+      if (this.eventBus) {
+        query.setEventBus(this.eventBus)
+      }
       this.add(query)
     }
 

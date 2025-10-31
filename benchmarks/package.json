@@ -1,0 +1,19 @@
+{
+  "name": "@mfestack/benchmarks",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "benchmark": "node --experimental-vm-modules --no-warnings ./src/run.ts",
+    "benchmark:size": "size-limit",
+    "benchmark:treeshake": "node --experimental-vm-modules --no-warnings ./src/treeshake-check.ts",
+    "benchmark:perf": "node --experimental-vm-modules --no-warnings ./src/performance.ts"
+  },
+  "devDependencies": {
+    "@mfestack/core": "workspace:*",
+    "@mfestack/react": "workspace:*",
+    "@mfestack/test-utils": "workspace:*",
+    "esbuild": "^0.25.11"
+  }
+}
+

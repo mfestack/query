@@ -10,8 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@mfestack/core": "^0.1.0",
-    "@mfestack/react": "^0.1.0",
+    "@mfestack/core": "workspace:*",
+    "@mfestack/react": "workspace:*",
+    "@mfestack/react-devtools": "workspace:*",
     "react": "^19.1.1",
     "react-dom": "^19.1.1"
   },

@@ -7,6 +7,7 @@ import type { QueryCache } from '../query/QueryCache'
 import type { MutationCache } from '../mutation/MutationCache'
 import type { Query } from '../query/Query'
 import type { Mutation } from '../mutation/Mutation'
+import type { EventBus, EventBusOptions } from '../utils/EventBus'
 
 export interface QueryClientConfig {
   defaultOptions?: DefaultOptions
@@ -14,6 +15,7 @@ export interface QueryClientConfig {
   mutationCache?: MutationCache
   logger?: Logger
   plugins?: AppStackPlugin[]
+  eventBus?: EventBusOptions & { instance?: EventBus }
 }
 
 export interface DefaultOptions {
@@ -30,6 +32,7 @@ export interface Logger {
 export interface QueryClient {
   queryCache: QueryCache
   mutationCache: MutationCache
+  eventBus: EventBus
   getQueryCache: () => QueryCache
   getMutationCache: () => MutationCache
   getDefaultOptions: () => DefaultOptions

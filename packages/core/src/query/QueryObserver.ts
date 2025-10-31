@@ -5,6 +5,8 @@ import type {
   QueryClient 
 } from '../types'
 import { Subscribable } from '../utils/Subscribable'
+import { taskScheduler } from '../scheduler/TaskScheduler'
+import { replaceEqualDeep } from '../utils/helpers'
 
 export interface QueryObserverResult<TData = unknown, TError = Error> {
   data: TData | undefined
@@ -45,6 +47,8 @@ export class QueryObserver<
   private currentQuery: any = null
   private currentResult: QueryObserverResult<TData, TError> | null = null
   private previousResult: QueryObserverResult<TData, TError> | null = null
+  private previousSelectedData?: TData
+  private refetchTaskId?: string
 
   constructor(
     client: QueryClient,
@@ -144,8 +148,19 @@ export class QueryObserver<
     }
 
     const state = this.currentQuery.state
+    
+    // Apply select with structural sharing to stabilize references
+    let nextData = state.data as unknown as TData | undefined
+    if (this.options.select && typeof this.options.select === 'function' && nextData !== undefined) {
+      const selected = (this.options.select as any)(state.data as TQueryFnData) as TData
+      nextData = this.previousSelectedData === undefined
+        ? selected
+        : replaceEqualDeep(this.previousSelectedData, selected)
+      this.previousSelectedData = nextData
+    }
+
     const result: QueryObserverResult<TData, TError> = {
-      data: state.data as TData | undefined,
+      data: nextData,
       error: state.error as TError | null,
       isError: state.isError,
       isLoading: state.isLoading,
@@ -171,6 +186,7 @@ export class QueryObserver<
     }
 
     this.currentResult = result
+    this.setupRefetchInterval()
   }
 
   private getDefaultResult(): QueryObserverResult<TData, TError> {
@@ -220,6 +236,30 @@ export class QueryObserver<
     this.options = newOptions
     this.updateQuery()
     this.notifyListeners()
+    this.setupRefetchInterval()
+  }
+
+  private setupRefetchInterval() {
+    const rawInterval = this.options.refetchInterval as number | false | undefined
+    const enabled = this.options.enabled !== false
+    if (!this.currentQuery || !enabled || rawInterval === false || rawInterval == null) {
+      if (this.refetchTaskId) {
+        taskScheduler.cancel(this.refetchTaskId)
+        this.refetchTaskId = undefined
+      }
+      return
+    }
+
+    const ms = typeof rawInterval === 'number' ? rawInterval : 0
+    if (ms <= 0) return
+
+    const taskId = `refetch:${this.currentQuery.queryHash}`
+    taskScheduler.cancel(taskId)
+    taskScheduler.enqueue(taskId, () => {
+      if (this.options.enabled === false) return
+      this.refetch().catch(() => {})
+    }, { delay: ms, repeat: true, interval: ms, priority: 'normal' })
+    this.refetchTaskId = taskId
   }
 
   private async refetch(): Promise<TData | undefined> {
@@ -245,10 +285,17 @@ export class QueryObserver<
     if (this.currentQuery) {
       const gc = this.currentQuery.options?.gcTime ?? 5 * 60 * 1000
       const toRemove = this.currentQuery
-      setTimeout(() => {
+      const taskId = `gc:${toRemove.queryHash}`
+      taskScheduler.cancel(taskId)
+      taskScheduler.enqueue(taskId, () => {
         // Only remove if still same query and not re-used
-        this.client.getQueryCache().remove(toRemove)
-      }, Math.max(0, gc))
+        // And ensure it has no observers
+        const stillSame = this.client.getQueryCache().find(toRemove.queryKey) === toRemove
+        const hasObservers = Array.isArray((toRemove as any).observers) && (toRemove as any).observers.length > 0
+        if (stillSame && !hasObservers) {
+          this.client.getQueryCache().remove(toRemove)
+        }
+      }, { delay: Math.max(0, gc), priority: 'low' })
       this.currentQuery = null
       this.updateResult()
       this.notifyListeners()

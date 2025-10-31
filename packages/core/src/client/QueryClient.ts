@@ -24,19 +24,43 @@ import { focusManager } from '../managers/FocusManager'
 import { onlineManager } from '../managers/OnlineManager'
 import { functionalUpdate } from '../utils/helpers'
 import { defaultOptions } from './defaultOptions'
+import { EventBus, type EventBusOptions } from '../utils/EventBus'
+import { Metrics } from '../metrics/Metrics'
 
 export class QueryClient implements QueryClientInterface {
   public queryCache: QueryCache
   public mutationCache: MutationCache
+  public eventBus: EventBus
+  public metrics: Metrics
   private pluginManager: PluginManager
   private defaultOptions: DefaultOptions
   private logger: Logger
   private isMounted = false
 
   constructor(config: QueryClientConfig = {}) {
-    this.queryCache = config.queryCache || new QueryCache()
-    this.mutationCache = config.mutationCache || new MutationCache()
+    // Initialize EventBus with optional configuration
+    const eventBusOptions: EventBusOptions = {
+      enableReplay: config.eventBus?.enableReplay ?? true,
+      defaultPriority: config.eventBus?.defaultPriority ?? 'normal',
+      replayBufferSize: config.eventBus?.replayBufferSize ?? 50,
+    }
+    this.eventBus = config.eventBus?.instance || new EventBus(eventBusOptions)
+    
+    // Initialize caches with EventBus reference
+    this.queryCache = config.queryCache || new QueryCache(this.eventBus)
+    if (config.queryCache && !(config.queryCache as any).eventBus) {
+      (config.queryCache as any).setEventBus(this.eventBus)
+    }
+    
+    this.mutationCache = config.mutationCache || new MutationCache(this.eventBus)
+    if (config.mutationCache && !(config.mutationCache as any).eventBus) {
+      (config.mutationCache as any).setEventBus(this.eventBus)
+    }
+    
     this.pluginManager = new PluginManager()
+    
+    // Initialize metrics and attach to EventBus
+    this.metrics = new Metrics(this.eventBus)
 
     this.defaultOptions = {
       ...defaultOptions,
@@ -87,8 +111,11 @@ export class QueryClient implements QueryClientInterface {
     query.state.data = newData
     query.state.dataUpdatedAt = Date.now()
     
+    // Emit EventBus event
+    this.eventBus.emit('query:updated', { query: query as any }, 'normal')
+    
     // Trigger plugin events
-    this.pluginManager.notifyQueryAdded(query)
+    this.pluginManager.notifyQueryAdded(query as any)
     this.pluginManager.notifyCacheUpdate(this.queryCache)
   }
 
@@ -107,10 +134,15 @@ export class QueryClient implements QueryClientInterface {
     const queries = this.queryCache.findAll(filters)
     this.logger.log('invalidateQueries', { filters, count: queries.length })
     
+    const queryKeys = queries.map(q => q.queryKey)
+    
     queries.forEach(query => {
       query.state.isInvalidated = true
       // TODO: Trigger refetch
     })
+    
+    // Emit EventBus event
+    this.eventBus.emit('cache:invalidated', { queryKeys, filters }, 'normal')
   }
 
   async refetchQueries(filters?: QueryFilters): Promise<void> {
@@ -214,6 +246,9 @@ export class QueryClient implements QueryClientInterface {
     this.queryCache.clear()
     this.mutationCache.clear()
     this.logger.log('clear')
+    
+    // Emit EventBus event
+    this.eventBus.emit('cache:cleared', {}, 'high')
   }
 
   mount(): void {

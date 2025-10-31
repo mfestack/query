@@ -1,6 +1,7 @@
 /* istanbul ignore file */
 
-// Re-export core
+// Re-export core (types will be available after build)
+// @ts-ignore
 export * from '@mfestack/core'
 
 // Minimal React adapter surface for initial integration
@@ -13,3 +14,4 @@ export { useMutation } from './hooks/useMutation'
 export { useIsFetching } from './hooks/useIsFetching'
 export { useIsMutating } from './hooks/useIsMutating'
 export { useInfiniteQuery } from './hooks/useInfiniteQuery'
+export { useMetrics } from './hooks'

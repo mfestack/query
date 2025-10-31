@@ -4,6 +4,9 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "removeComments": false
-  }
+    "removeComments": false,
+    "incremental": false,
+    "composite": false
+  },
+  "include": ["src/**/*"]
 }

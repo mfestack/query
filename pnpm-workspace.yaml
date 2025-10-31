@@ -10,3 +10,4 @@ packages:
   - 'examples/angular/*'
   - 'examples/svelte/*'
   - 'examples/solid/*'
+  - 'benchmarks'

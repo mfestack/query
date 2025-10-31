@@ -1,14 +1,21 @@
 // MutationCache - Manages mutation storage and retrieval
 import type { MutationKey, MutationOptions, MutationFilters, MutationCacheNotifyEvent, QueryClient, MutationFunction } from '../types'
+import type { EventBus } from '../utils/EventBus'
 import { Mutation } from './Mutation'
 import { hashKey, matchMutation } from '../utils/helpers'
 import { Subscribable } from '../utils/Subscribable'
 
 export class MutationCache extends Subscribable<(event: MutationCacheNotifyEvent) => void> {
   private mutations = new Map<string, Mutation>()
+  private eventBus?: EventBus
 
-  constructor() {
+  constructor(eventBus?: EventBus) {
     super()
+    this.eventBus = eventBus
+  }
+
+  setEventBus(eventBus: EventBus) {
+    this.eventBus = eventBus
   }
 
   find<TData = unknown, TError = Error, TVariables = unknown, TContext = unknown>(
@@ -32,12 +39,17 @@ export class MutationCache extends Subscribable<(event: MutationCacheNotifyEvent
     const mutationHash = mutation.mutationKey ? hashKey(mutation.mutationKey) : `mutation_${Date.now()}`
     this.mutations.set(mutationHash, mutation as unknown as Mutation<unknown, Error, unknown, unknown>)
     this.notify({ type: 'added', mutation })
+    // Note: mutation:started event will be emitted when mutation.execute() is called
   }
 
   remove<TData, TError, TVariables, TContext>(mutation: Mutation<TData, TError, TVariables, TContext>) {
     const mutationHash = mutation.mutationKey ? hashKey(mutation.mutationKey) : `mutation_${Date.now()}`
     if (this.mutations.delete(mutationHash)) {
       this.notify({ type: 'removed', mutation })
+      // Emit EventBus event
+      if (this.eventBus) {
+        this.eventBus.emit('mutation:removed', { mutation: mutation as any }, 'normal')
+      }
     }
   }
 
@@ -66,6 +78,10 @@ export class MutationCache extends Subscribable<(event: MutationCacheNotifyEvent
         mutationFn: options.mutationFn as MutationFunction<TData, TVariables>
       }
       mutation = new Mutation<TData, TError, TVariables, TContext>(mutationOptions)
+      // Set EventBus reference on mutation for lifecycle events
+      if (this.eventBus) {
+        mutation.setEventBus(this.eventBus)
+      }
       this.add(mutation)
     }
 

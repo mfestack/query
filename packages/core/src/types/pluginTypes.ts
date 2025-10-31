@@ -88,10 +88,37 @@ export interface BroadcastPluginOptions {
   deserialize?: (data: string) => unknown;
 }
 
+export type LogLevel = 'debug' | 'info' | 'warn' | 'error'
+
+export interface StructuredLog {
+  timestamp: number
+  level: LogLevel
+  message: string
+  category: string
+  data?: Record<string, any>
+  error?: {
+    name: string
+    message: string
+    stack?: string
+  }
+}
+
+export interface ErrorSurface {
+  error: Error
+  context: Record<string, any>
+  timestamp: number
+  count: number
+}
+
 export interface LoggerPluginOptions {
-  level?: 'log' | 'warn' | 'error';
-  prefix?: string;
-  logger?: Logger;
+  level?: LogLevel | LogLevel[]
+  prefix?: string
+  logger?: Logger
+  enableEventBus?: boolean // Subscribe to EventBus events
+  structured?: boolean // Use structured logging format
+  errorAggregation?: boolean // Aggregate duplicate errors
+  maxErrors?: number // Max errors to keep in memory
+  filter?: (log: StructuredLog) => boolean // Custom log filter
 }
 
 export interface DevToolsPluginOptions {
