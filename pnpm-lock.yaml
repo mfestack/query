@@ -86,6 +86,21 @@ importers:
         specifier: 3.2.4
         version: 3.2.4(@types/node@22.18.13)(@vitest/ui@4.0.4)(jiti@2.6.1)(jsdom@27.0.1(postcss@8.5.6))(yaml@2.8.1)
 
+  benchmarks:
+    devDependencies:
+      '@mfestack/core':
+        specifier: workspace:*
+        version: link:../packages/core
+      '@mfestack/react':
+        specifier: workspace:*
+        version: link:../packages/react
+      '@mfestack/test-utils':
+        specifier: workspace:*
+        version: link:../packages/test-utils
+      esbuild:
+        specifier: ^0.25.11
+        version: 0.25.11
+
   packages/core:
     devDependencies:
       '@mfestack/test-utils':
