@@ -1,3 +1,28 @@
+## v0.5.0
+
+Features and improvements:
+
+- Phase 5: DevTools and Observability
+  - EventBus: Typed event system with replay buffer and priority queuing (high, normal, low)
+  - LoggerPlugin: Structured logging with configurable levels (error, warn, info, debug), error aggregation, and debug toggles
+  - @mfestack/devtools-core: Framework-agnostic DevTools core with state management, EventBus subscriptions, and action methods
+  - @mfestack/react-devtools: React DevTools UI with docked panel, search/filter/sort, data explorer, and modern dark-mode theme
+  - Metrics System: Lightweight in-memory metrics buffer tracking queries, mutations, cache operations with React hook support
+  - Instrumentation: Event emissions throughout Query and Mutation lifecycle (query:added, query:updated, mutation:started, etc.)
+
+- Phase 6: Performance Optimizations
+  - BatchManager: Enhanced with RAF/idle flush instead of setTimeout(0), error handling, and strategy options
+  - NotifyManager: Enhanced with microtask and RAF batching, queue size limits, and configurable flush strategies
+  - TaskScheduler: Unified scheduler for background tasks with priorities, delays, intervals, and cancellation
+  - BackoffController: Retry delay calculation with exponential/linear/constant strategies, jitter support, and max delay caps
+  - Select Memoization: Implemented in QueryObserver with structural sharing using replaceEqualDeep for stable references
+  - Integration: TaskScheduler integrated with QueryClient for refetch intervals and garbage collection timers
+  - Benchmarks: Comprehensive suite for bundle size, performance, and tree-shaking verification
+
+- Tests: All 256 tests passing (208 core, 33 react, 15 devtools-core)
+
+- Documentation: DevTools usage guide, updated metrics API docs, enhanced examples
+
 ## v0.4.0
 
 Features and improvements:
