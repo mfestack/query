@@ -17,6 +17,7 @@ interface Todo {
 export function OptimisticUpdateDemo() {
   const queryClient = useQueryClient()
   const [inputValue, setInputValue] = useState('')
+  const tempIdRef = { current: 0 } // Use a ref to track temp IDs
 
   // Fetch todos
   const { data: todos = [], isLoading } = useQuery<Todo[]>({
@@ -33,12 +34,12 @@ export function OptimisticUpdateDemo() {
 
   // Create todo mutation with optimistic update
   const createTodo = useMutation({
-    mutationFn: async (data: { title: string; tempId: number }): Promise<Todo> => {
+    mutationFn: async (title: string): Promise<Todo> => {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000))
       return {
         id: Date.now(),
-        title: data.title,
+        title,
         completed: false,
       }
     },
@@ -49,12 +50,13 @@ export function OptimisticUpdateDemo() {
       // Snapshot previous value
       const previousTodos = queryClient.getQueryData<Todo[]>(['todos'])
 
-      // Generate temporary ID
-      const tempId = Date.now()
+      // Generate unique temporary ID (using timestamp + counter)
+      tempIdRef.current = tempIdRef.current - 1 // Use negative IDs for temp items
+      const tempId = tempIdRef.current
 
       // Optimistically update cache
       const newTodo: Todo = {
-        id: tempId, // Temporary ID
+        id: tempId, // Temporary ID (negative)
         title,
         completed: false,
       }

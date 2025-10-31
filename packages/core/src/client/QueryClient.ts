@@ -111,6 +111,13 @@ export class QueryClient implements QueryClientInterface {
     this.logger.log('setQueryData', { queryKey, newData })
     query.state.data = newData
     query.state.dataUpdatedAt = Date.now()
+    query.state.isSuccess = true
+    query.state.isError = false
+    query.state.status = 'success'
+    query.state.isFetched = true
+    
+    // Notify observers so useQuery hooks re-render
+    ;(query as any).notifyObservers()
     
     // Emit EventBus event
     this.eventBus.emit('query:updated', { query: query as any }, 'normal')
