@@ -17,6 +17,8 @@ try {
   }
 }
 
+const isDevtoolsAvailable = !!AppStackDevtoolsCore
+
 describe('DevTools Bridge Integration', () => {
   let queryClient: QueryClient
   let devtools: any
@@ -36,9 +38,8 @@ describe('DevTools Bridge Integration', () => {
   })
 
   describe('EventBus → DevTools state sync', () => {
-    test('should sync query lifecycle events to DevTools', async () => {
-      if (!AppStackDevtoolsCore || !devtools) {
-        test.skip('DevTools not available', () => {})
+    test.skipIf(!isDevtoolsAvailable)('should sync query lifecycle events to DevTools', async () => {
+      if (!devtools) {
         return
       }
       const state1 = devtools.getState()
@@ -57,9 +58,8 @@ describe('DevTools Bridge Integration', () => {
       expect(state2.queries[0].status).toBe('success')
     })
 
-    test('should sync mutation lifecycle events to DevTools', async () => {
-      if (!AppStackDevtoolsCore || !devtools) {
-        test.skip('DevTools not available', () => {})
+    test.skipIf(!isDevtoolsAvailable)('should sync mutation lifecycle events to DevTools', async () => {
+      if (!devtools) {
         return
       }
       const mutation = queryClient.mutationCache.build(queryClient, {
@@ -73,12 +73,15 @@ describe('DevTools Bridge Integration', () => {
 
       const state = devtools.getState()
       expect(state.mutations.length).toBeGreaterThan(0)
-      const devtoolsMutation = state.mutations.find(m => m.mutationKey?.[0] === 'createUser')
+      const devtoolsMutation = state.mutations.find((m: any) => m.mutationKey?.[0] === 'createUser')
       expect(devtoolsMutation).toBeDefined()
       expect(devtoolsMutation?.status).toBe('success')
     })
 
-    test('should sync cache invalidation events', async () => {
+    test.skipIf(!isDevtoolsAvailable)('should sync cache invalidation events', async () => {
+      if (!queryClient || !devtools) {
+        return
+      }
       await queryClient.fetchQuery({
         queryKey: ['test'],
         queryFn: () => Promise.resolve('data'),
@@ -112,9 +115,8 @@ describe('DevTools Bridge Integration', () => {
   })
 
   describe('Metrics → EventBus → DevTools', () => {
-    test('should track metrics from EventBus events', async () => {
-      if (!AppStackDevtoolsCore) {
-        test.skip('DevTools not available', () => {})
+    test.skipIf(!isDevtoolsAvailable)('should track metrics from EventBus events', async () => {
+      if (!queryClient) {
         return
       }
       const snapshot1 = queryClient.metrics.getSnapshot()
@@ -132,9 +134,8 @@ describe('DevTools Bridge Integration', () => {
       expect(snapshot2.queriesSucceeded).toBeGreaterThan(0)
     })
 
-    test('should track mutation metrics through lifecycle', async () => {
-      if (!AppStackDevtoolsCore) {
-        test.skip('DevTools not available', () => {})
+    test.skipIf(!isDevtoolsAvailable)('should track mutation metrics through lifecycle', async () => {
+      if (!queryClient) {
         return
       }
       const snapshot1 = queryClient.metrics.getSnapshot()
@@ -155,9 +156,8 @@ describe('DevTools Bridge Integration', () => {
       expect(snapshot2.mutationsFailed).toBe(0)
     })
 
-    test('should track failed mutations', async () => {
-      if (!AppStackDevtoolsCore) {
-        test.skip('DevTools not available', () => {})
+    test.skipIf(!isDevtoolsAvailable)('should track failed mutations', async () => {
+      if (!queryClient) {
         return
       }
       const mutation = queryClient.mutationCache.build(queryClient, {
@@ -179,9 +179,8 @@ describe('DevTools Bridge Integration', () => {
   })
 
   describe('DevTools actions → QueryClient', () => {
-    test('should refetch query through DevTools', async () => {
-      if (!AppStackDevtoolsCore || !devtools) {
-        test.skip('DevTools not available', () => {})
+    test.skipIf(!isDevtoolsAvailable)('should refetch query through DevTools', async () => {
+      if (!devtools || !queryClient) {
         return
       }
       await queryClient.fetchQuery({
@@ -204,9 +203,8 @@ describe('DevTools Bridge Integration', () => {
       expect(state2.queries.length).toBe(1)
     })
 
-    test('should invalidate query through DevTools', async () => {
-      if (!AppStackDevtoolsCore || !devtools) {
-        test.skip('DevTools not available', () => {})
+    test.skipIf(!isDevtoolsAvailable)('should invalidate query through DevTools', async () => {
+      if (!devtools || !queryClient) {
         return
       }
       await queryClient.fetchQuery({
@@ -241,9 +239,8 @@ describe('DevTools Bridge Integration', () => {
       }
     })
 
-    test('should remove query through DevTools', async () => {
-      if (!AppStackDevtoolsCore || !devtools) {
-        test.skip('DevTools not available', () => {})
+    test.skipIf(!isDevtoolsAvailable)('should remove query through DevTools', async () => {
+      if (!devtools || !queryClient) {
         return
       }
       await queryClient.fetchQuery({
@@ -276,9 +273,8 @@ describe('DevTools Bridge Integration', () => {
       }
     })
 
-    test('should clear cache through DevTools', async () => {
-      if (!AppStackDevtoolsCore || !devtools) {
-        test.skip('DevTools not available', () => {})
+    test.skipIf(!isDevtoolsAvailable)('should clear cache through DevTools', async () => {
+      if (!devtools || !queryClient) {
         return
       }
       await Promise.all([
@@ -322,9 +318,8 @@ describe('DevTools Bridge Integration', () => {
   })
 
   describe('end-to-end flow', () => {
-    test('complete query lifecycle with metrics and DevTools', async () => {
-      if (!AppStackDevtoolsCore || !devtools) {
-        test.skip('DevTools not available', () => {})
+    test.skipIf(!isDevtoolsAvailable)('complete query lifecycle with metrics and DevTools', async () => {
+      if (!devtools || !queryClient) {
         return
       }
       // Initial state
@@ -354,7 +349,7 @@ describe('DevTools Bridge Integration', () => {
 
       // Event timeline should have events
       expect(devtools2.events.length).toBeGreaterThan(0)
-      expect(devtools2.events.some(e => e.type === 'query:updated')).toBe(true)
+      expect(devtools2.events.some((e: any) => e.type === 'query:updated')).toBe(true)
 
       // Invalidate through DevTools
       await devtools.invalidateQuery(['complete'])
