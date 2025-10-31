@@ -326,14 +326,57 @@ export class QueryClient implements QueryClientInterface {
   }
 
   async prefetchQuery<TData, TError, TVariables, TContext extends QueryKey>(
-    _options: QueryOptions<TData, TError, TVariables, TContext>
+    options: QueryOptions<TData, TError, TVariables, TContext>
   ): Promise<void> {
-    throw new Error('prefetchQuery not implemented yet')
+    const queryKey = options.queryKey
+    let query = this.queryCache.find(queryKey)
+    
+    // If query exists and has fresh data, skip prefetch
+    if (query && query.state.dataUpdatedAt > 0 && !query.state.isStale) {
+      return
+    }
+    
+    // Build query if it doesn't exist
+    if (!query) {
+      query = this.queryCache.build<TData, TError, TVariables, TContext>(this, {
+        ...options,
+        retry: options.retry ?? this.defaultOptions.queries?.retry,
+        retryDelay: options.retryDelay ?? this.defaultOptions.queries?.retryDelay,
+        staleTime: options.staleTime ?? this.defaultOptions.queries?.staleTime,
+        gcTime: options.gcTime ?? this.defaultOptions.queries?.gcTime,
+      } as QueryOptions<TData, TError, TVariables, TContext>) as any
+    }
+    
+    // Fetch the query
+    if (query && typeof query.fetch === 'function') {
+      await query.fetch()
+    }
   }
 
   async fetchQuery<TData, TError, TVariables, TContext extends QueryKey>(
-    _options: QueryOptions<TData, TError, TVariables, TContext>
+    options: QueryOptions<TData, TError, TVariables, TContext>
   ): Promise<TData> {
-    throw new Error('fetchQuery not implemented yet')
+    const queryKey = options.queryKey
+    let query = this.queryCache.find(queryKey)
+    
+    // Build query if it doesn't exist
+    if (!query) {
+      query = this.queryCache.build<TData, TError, TVariables, TContext>(this, {
+        ...options,
+        retry: options.retry ?? this.defaultOptions.queries?.retry,
+        retryDelay: options.retryDelay ?? this.defaultOptions.queries?.retryDelay,
+        staleTime: options.staleTime ?? this.defaultOptions.queries?.staleTime,
+        gcTime: options.gcTime ?? this.defaultOptions.queries?.gcTime,
+      } as QueryOptions<TData, TError, TVariables, TContext>) as any
+    }
+    
+    // Fetch the query and return data
+    if (query && typeof query.fetch === 'function') {
+      const result = await query.fetch()
+      return result as TData
+    }
+    
+    // Return existing data if available
+    return query?.state.data as TData
   }
 }

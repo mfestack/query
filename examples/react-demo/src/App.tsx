@@ -6,6 +6,7 @@ import { CacheDemo } from './components/CacheDemo'
 import { SuspenseDemo } from './components/SuspenseDemo'
 import { KeepPreviousDataDemo } from './components/KeepPreviousDataDemo'
 import { FocusReconnectDemo } from './components/FocusReconnectDemo'
+import { InfiniteQueryDemo } from './components/InfiniteQueryDemo'
 import './App.css'
 
 // Create a client
@@ -49,6 +50,11 @@ function App() {
           <div className="demo-section">
             <h2>🔄 Refetch on Focus / Reconnect</h2>
             <FocusReconnectDemo />
+          </div>
+
+          <div className="demo-section">
+            <h2>♾️ Infinite Query Demo</h2>
+            <InfiniteQueryDemo />
           </div>
         </main>
       </div>
